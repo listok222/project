@@ -417,12 +417,17 @@ dropToggleBtn.onclick=()=>{
   dropToggleBtn.textContent=on?"Скрыть возможные предметы":"Показать возможные предметы";
 };
 
-function buildReel(){
+// Item width + gap (must match CSS: min-width ~110px + gap 10px)
+const ITEM_W=120;
+const REEL_COUNT=28;
+const WIN_INDEX=22; // which slot lands under the center marker
+
+function buildReel(winEntry){
   track.style.transition="none";
   track.style.transform="translateX(0)";
   track.innerHTML="";
-  for(let i=0;i<18;i++){
-    const p=weightedPick();
+  for(let i=0;i<REEL_COUNT;i++){
+    const p=(i===WIN_INDEX && winEntry)?winEntry:weightedPick();
     track.innerHTML+=`<div class="item">${imgTag(p.name)}<span>${shortName(p.name)}</span></div>`;
   }
   void track.offsetWidth;
@@ -437,7 +442,7 @@ function openCase(c){
   result.textContent="Нажми «Открыть», чтобы запустить рулетку";
   dropList.classList.remove("on");
   dropToggleBtn.textContent="Показать возможные предметы";
-  buildReel();
+  buildReel(null); // preview strip only
   modal.classList.add("on");
   document.body.style.overflow="hidden";
 }
@@ -449,12 +454,23 @@ spin.onclick=()=>{
   if(!current)return;
   balance-=current[2];updateBalance();
   spin.disabled=true;
-  buildReel();
+  result.textContent="Крутим…";
+
+  // 1) decide the real winner first
   const winEntry=weightedPick();
+  // 2) put that winner exactly under the marker stop position
+  buildReel(winEntry);
+
+  // 3) measure where the winning item's center should land
   requestAnimationFrame(()=>{requestAnimationFrame(()=>{
-    // ~11 items * ~120px ≈ center near item 11
-    track.style.transform="translateX(-1260px)";
+    const roulette=track.parentElement;
+    const markerX=roulette.clientWidth/2;
+    const winEl=track.children[WIN_INDEX];
+    const itemCenter=winEl.offsetLeft+winEl.offsetWidth/2;
+    const offset=itemCenter-markerX;
+    track.style.transform=`translateX(${-offset}px)`;
   })});
+
   setTimeout(()=>{
     const price=priceFor(winEntry);
     const item={id:invId++,name:winEntry.name,price,rarity:winEntry.rarity};
@@ -464,7 +480,7 @@ spin.onclick=()=>{
     result.innerHTML=`Ты получил <b>${shortName(winEntry.name)}</b>${star} · ${fmt(price)} DM — предмет добавлен в инвентарь 🎉`;
     spin.disabled=false;
     spin.textContent=`Открыть ещё за ${fmt(current[2])} DM`;
-  },2450);
+  },2500);
 };
 
 document.getElementById("search").oninput=function(){
