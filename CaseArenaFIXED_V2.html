@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Case Arena — Demo</title>
+<style>
+:root{--bg:#0b0e13;--panel:#11161f;--panel2:#171d27;--line:#252d39;--text:#eef2f7;--muted:#8c98a8;--accent:#7c5cff;--green:#35d07f;--red:#ff5577;--gold:#ffd76a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#20243a 0,#0b0e13 42%);color:var(--text);font:14px Inter,system-ui,Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}.top{height:64px;border-bottom:1px solid var(--line);background:#0d1118eF;backdrop-filter:blur(10px);position:sticky;top:0;z-index:10}
+.nav{max-width:1240px;height:100%;margin:auto;display:flex;align-items:center;gap:24px;padding:0 18px}.logo{font-weight:900;letter-spacing:.8px;font-size:19px}.logo span{color:var(--accent)}.links{display:flex;gap:20px;color:#cbd3df}.links a{color:inherit;text-decoration:none}.links a:hover{color:#fff}.wallet{margin-left:auto;background:#171d27;border:1px solid var(--line);border-radius:10px;padding:9px 13px;color:#b9c4d4}.balance{color:#fff;font-weight:800}.menu{display:none}
+main{max-width:1240px;margin:auto;padding:24px 18px 60px}.hero{display:grid;grid-template-columns:1.3fr .7fr;gap:16px;margin-bottom:18px}.heroBox{border:1px solid var(--line);background:linear-gradient(135deg,#171c29,#10141c);border-radius:16px;padding:28px;min-height:170px}.heroBox h1{margin:0 0 10px;font-size:32px}.heroBox p{color:var(--muted);max-width:620px}
+.toolbar{display:flex;gap:10px;margin:18px 0;flex-wrap:wrap}.search{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:#fff;padding:12px 14px;outline:none}.filter{background:var(--panel);border:1px solid var(--line);color:#d9e0ea;border-radius:10px;padding:11px 14px}.section{margin-top:24px}.section h2{font-size:18px;margin:0 0 4px}.sectionHint{color:var(--muted);font-size:12.5px;margin:0 0 12px}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.card{background:linear-gradient(180deg,#151b24,#10151d);border:1px solid var(--line);border-radius:13px;padding:13px;transition:.18s;position:relative;overflow:hidden}.card:hover{transform:translateY(-2px);border-color:#3a4352}.caseArt{height:120px;position:relative;border-radius:10px;background:radial-gradient(circle at 50% 35%,#5d4bb7 0,#252147 28%,#141a24 68%);display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:12px} .caseArt img{max-width:92%;max-height:92%;object-fit:contain;filter:drop-shadow(0 12px 14px #0008);transition:opacity .2s} .caseBadge{position:absolute;left:8px;top:8px;font-size:9px;font-weight:900;letter-spacing:1px;color:#9eabc0;background:#0b0e13cc;border:1px solid #303847;border-radius:5px;padding:3px 5px}.card:nth-child(3n) .caseArt{background:radial-gradient(circle at 50% 35%,#b33b70 0,#43243d 28%,#141a24 68%)}.card:nth-child(4n) .caseArt{background:radial-gradient(circle at 50% 35%,#238b8a 0,#203e45 28%,#141a24 68%)}.name{font-weight:800;margin-bottom:5px}.meta{color:var(--muted);font-size:12px}.open{width:100%;margin-top:11px;padding:10px;border:0;border-radius:9px;background:var(--accent);color:#fff;font-weight:800}.price{float:right;color:#fff}.empty{display:none;color:var(--muted);padding:30px;text-align:center}
+
+/* clicker */
+.clickerZone{cursor:pointer;user-select:none;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;background:radial-gradient(circle at 50% 38%,#2a2150,#131725 72%);border:1px solid #3a2f66;overflow:hidden}
+.clickerZone:hover{border-color:#5b48a8}
+.clickerOrb{width:82px;height:82px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#c3b2ff,#7c5cff 55%,#4c37a8 100%);box-shadow:0 0 0 0 rgba(124,92,255,.55);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;animation:pulse 1.8s infinite}
+.clickerZone:active .clickerOrb{transform:scale(.9)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,92,255,.55)}70%{box-shadow:0 0 0 22px rgba(124,92,255,0)}100%{box-shadow:0 0 0 0 rgba(124,92,255,0)}}
+.clickerZone b{font-size:16px}
+.clickerZone small{color:#aeb7c7}
+.comboTag{position:absolute;top:12px;right:14px;color:var(--gold);font-weight:800;font-size:13px;min-height:16px}
+.floatCoin{position:absolute;font-weight:800;color:var(--gold);pointer-events:none;animation:floatUp .75s ease-out forwards;z-index:5}
+@keyframes floatUp{to{transform:translateY(-48px);opacity:0}}
+
+/* inventory */
+.invGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.invCard{background:linear-gradient(180deg,#151b24,#10151d);border:1px solid var(--line);border-left:3px solid var(--line);border-radius:13px;padding:11px;text-align:center}
+.invArt{height:86px;border-radius:9px;background:#0f141c;display:flex;align-items:center;justify-content:center;margin-bottom:9px}
+.invArt img{max-width:94%;max-height:94%;object-fit:contain;display:block;transition:opacity .2s}
+.invName{font-size:12.5px;font-weight:700;min-height:32px;line-height:1.25}
+.invPrice{color:var(--gold);font-weight:800;margin:5px 0 9px}
+.sellBtn{width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);background:#1a212c;color:#fff;font-weight:700}
+.sellBtn:hover{border-color:var(--red);color:var(--red)}
+.invBar{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:14px}
+.invBar b{color:var(--gold)}
+
+/* upgrade */
+.panelBox{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.upgradeRow{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:6px;min-width:220px}
+.field label{color:var(--muted);font-size:12px}
+select{background:#171d27;border:1px solid var(--line);color:#fff;border-radius:9px;padding:10px 12px}
+.multRow{display:flex;gap:8px}
+.multBtn{background:#171d27;border:1px solid var(--line);color:#d9e0ea;border-radius:9px;padding:9px 13px;font-weight:700}
+.multBtn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.upgradeStats{display:flex;gap:22px;margin:16px 0;flex-wrap:wrap}
+.stat{background:#171d27;border:1px solid var(--line);border-radius:10px;padding:10px 16px;min-width:140px}
+.stat span{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}
+.stat b{font-size:16px}
+.runBtn{padding:12px 20px;border:0;border-radius:10px;background:var(--accent);color:#fff;font-weight:800}
+.runBtn:disabled{opacity:.45;cursor:not-allowed}
+.upgradeResult{margin-top:12px;color:var(--muted);min-height:20px}
+.upgradeFx,.contractFx{margin-top:16px;height:150px;border:1px solid var(--line);border-radius:13px;background:radial-gradient(circle,#241f43,#0d1219 70%);display:none;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.upgradeFx.on,.contractFx.on{display:flex}
+.fxItem{width:145px;height:110px;border-radius:12px;background:#171d27;border:1px solid #394254;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;position:absolute}
+.fxItem img{width:105px;height:70px;object-fit:contain;filter:drop-shadow(0 10px 12px #0008)}
+.upgradeFx.on .fxItem{animation:upgradeSpin 1.35s cubic-bezier(.2,.8,.2,1)}
+@keyframes upgradeSpin{0%{transform:translateX(-260px) rotate(-12deg) scale(.7);opacity:0}35%{opacity:1}65%{transform:translateX(0) rotate(8deg) scale(1.08)}100%{transform:translateX(0) rotate(0) scale(1)}}
+.contractFx.on .fxItem{animation:contractForge 1.55s cubic-bezier(.15,.75,.2,1)}
+@keyframes contractForge{0%{transform:scale(.35) rotate(-25deg);opacity:0;filter:brightness(2)}45%{transform:scale(1.18) rotate(8deg);opacity:1;filter:brightness(1.8)}75%{transform:scale(.94) rotate(-3deg)}100%{transform:scale(1) rotate(0);filter:brightness(1)}}
+.fxRing{position:absolute;width:220px;height:220px;border:2px solid #7c5cff55;border-radius:50%;animation:ringPulse 1.3s ease-out infinite}
+@keyframes ringPulse{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.35);opacity:0}}
+
+/* contracts */
+.contractGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:14px}
+.contractItem{display:flex;flex-direction:column;align-items:center;gap:5px;background:#171d27;border:1px solid var(--line);border-radius:10px;padding:9px;cursor:pointer;text-align:center;font-size:11px}
+.contractItem img{width:44px;height:34px;object-fit:contain}
+.contractItem input{display:none}
+.contractItem.picked{border-color:var(--accent);background:#1d1a33}
+.contractItem small{color:var(--gold)}
+.contractBar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+
+.empty2{color:var(--muted);padding:26px;text-align:center;border:1px dashed var(--line);border-radius:12px}
+
+/* drop preview inside case modal */
+.dropToggle{margin:12px 0}
+.dropToggle button{width:100%;padding:10px;border-radius:9px;background:#171d27;border:1px solid var(--line);color:#d9e0ea;font-weight:700}
+.dropList{display:none;grid-template-columns:repeat(4,1fr);gap:8px;max-height:230px;overflow-y:auto;margin-top:10px;padding-right:2px}
+.dropList.on{display:grid}
+.dropItem{background:#171d27;border:1px solid var(--line);border-left:3px solid var(--line);border-radius:9px;padding:8px;text-align:center;font-size:10.5px}
+.dropItem img{width:100%;height:38px;object-fit:contain;margin-bottom:4px;transition:opacity .2s}
+.dropName{display:block;font-weight:700;line-height:1.2;min-height:24px}
+.dropPrice{display:block;color:var(--muted);margin:3px 0 2px}
+.dropChance{display:block;font-weight:800}
+
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;z-index:20;padding:18px}.modal.on{display:flex}.dialog{width:min(640px,100%);max-height:92vh;overflow-y:auto;background:#11161f;border:1px solid #303847;border-radius:18px;padding:22px;box-shadow:0 25px 80px #000}.dialog h2{margin-top:0}.roulette{height:145px;border-radius:12px;border:1px solid var(--line);overflow:hidden;position:relative;background:#0d1219;display:flex;align-items:center}.track{display:flex;gap:10px;position:absolute;left:0;transform:translateX(0);transition:transform 2.4s cubic-bezier(.12,.8,.12,1)}.item{min-width:118px;height:105px;border:1px solid var(--line);border-radius:10px;background:#171d27;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px}.item img{width:96px;height:72px;object-fit:contain;filter:drop-shadow(0 8px 8px #0008);transition:opacity .2s}.marker{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;box-shadow:0 0 12px #fff;z-index:2}.result{text-align:center;margin:15px 0;font-size:18px}.actions{display:flex;gap:10px}.actions button{flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);background:#1a212c;color:#fff}.actions .primary{background:var(--accent);border-color:var(--accent)}
+footer{max-width:1240px;margin:auto;padding:0 18px 40px;color:#687487;border-top:1px solid var(--line);padding-top:20px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(3,1fr)}.invGrid{grid-template-columns:repeat(3,1fr)}.contractGrid{grid-template-columns:repeat(4,1fr)}.dropList{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}.links{display:none}.menu{display:block}.nav{gap:12px}}
+@media(max-width:600px){.grid{grid-template-columns:repeat(2,1fr)}.invGrid{grid-template-columns:repeat(2,1fr)}.contractGrid{grid-template-columns:repeat(3,1fr)}.dropList{grid-template-columns:repeat(2,1fr)}.heroBox h1{font-size:25px}.wallet{font-size:12px}}
+</style>
+</head>
+<body>
+<header class="top"><nav class="nav">
+  <div class="logo">CASE <span>ARENA</span></div>
+  <div class="links"><a href="#cases">Кейсы</a><a href="#inventory">Инвентарь</a><a href="#upgrade">Апгрейд</a><a href="#contracts">Контракты</a><a href="#bonus">Бонусы</a></div>
+  <div class="wallet">Демо-баланс: <span class="balance" id="balance">10 000</span> DM</div>
+  <button class="menu">☰</button>
+</nav></header>
+
+<main>
+<section class="hero">
+  <div class="heroBox"><h1>Открывай кейсы в демо-режиме</h1><p>Все предметы и баланс виртуальные. Никаких платежей, Steam-авторизации или вывода средств — только игровая механика.</p></div>
+  <div class="heroBox promo clickerZone" id="bonus"><span class="comboTag" id="comboTag"></span><div class="clickerOrb">DM</div><b id="clickHint">Нажми, чтобы получить монеты</b><small>Светящаяся область пополняет демо-баланс</small></div>
+</section>
+
+<div class="toolbar"><input id="search" class="search" placeholder="Поиск кейса…"><button class="filter" data-filter="all">Все</button><button class="filter" data-filter="cheap">До 100 DM</button><button class="filter" data-filter="rare">Редкие</button></div>
+
+<section id="cases" class="section"><h2>Популярные кейсы</h2><p class="sectionHint">Открывай кейсы за демо-монеты — предметы попадают в инвентарь. Ножи и перчатки — редкий и дорогой дроп.</p><div id="grid" class="grid"></div><div id="empty" class="empty">Ничего не найдено</div></section>
+
+<section id="inventory" class="section">
+  <h2>Инвентарь</h2>
+  <p class="sectionHint">Продавай предметы обратно за демо-монеты или используй их в апгрейде и контрактах.</p>
+  <div class="invBar">Предметов: <b id="invCount">0</b>&nbsp;·&nbsp;Суммарная стоимость: <b id="invTotal">0</b> DM</div>
+  <div id="invGrid" class="invGrid"></div>
+  <div id="invEmpty" class="empty2">Инвентарь пуст — открой кейс, чтобы получить первый предмет.</div>
+</section>
+
+<section id="upgrade" class="section">
+  <h2>Апгрейд</h2>
+  <p class="sectionHint">Рискни предметом ради более дорогого — шанс тем ниже, чем выше множитель.</p>
+  <div class="panelBox">
+    <div class="upgradeRow">
+      <div class="field"><label>Предмет из инвентаря</label>
+        <select id="upgradeSelect"><option value="">— выбери предмет —</option></select>
+      </div>
+      <div class="field"><label>Множитель</label>
+        <div class="multRow">
+          <button class="multBtn active" data-mult="2">×2</button>
+          <button class="multBtn" data-mult="3">×3</button>
+          <button class="multBtn" data-mult="5">×5</button>
+          <button class="multBtn" data-mult="10">×10</button>
+        </div>
+      </div>
+      <button class="runBtn" id="btnUpgrade" disabled>Запустить апгрейд</button>
+    </div>
+    <div class="upgradeStats">
+      <div class="stat"><span>Шанс успеха</span><b id="upgradeChance">—</b></div>
+      <div class="stat"><span>Цель при успехе</span><b id="upgradeTarget">—</b></div>
+      <div class="stat"><span>При неудаче</span><b style="color:var(--red)">предмет теряется</b></div>
+    </div>
+    <div class="upgradeFx" id="upgradeFx"><div class="fxRing"></div><div class="fxItem" id="upgradeFxItem"></div></div><div class="upgradeResult" id="upgradeResult"></div>
+  </div>
+</section>
+
+<section id="contracts" class="section">
+  <h2>Контракты</h2>
+  <p class="sectionHint">Выбери ровно 5 предметов — получишь 1 новый, ценнее среднего по выбору.</p>
+  <div class="panelBox">
+    <div id="contractGrid" class="contractGrid"></div>
+    <div id="contractEmpty" class="empty2">В инвентаре пока нет предметов для контракта.</div>
+    <div class="contractBar">
+      <span>Выбрано: <b id="contractCount">0</b>/5</span>
+      <button class="runBtn" id="btnContract" disabled>Собрать контракт</button>
+    </div>
+    <div class="contractFx" id="contractFx"><div class="fxRing"></div><div class="fxItem" id="contractFxItem"></div></div><div class="upgradeResult" id="contractResult"></div>
+  </div>
+</section>
+
+</main>
+
+<footer>CASE ARENA DEMO · Виртуальная игра без денежных ставок и покупок.</footer>
+
+<div class="modal" id="modal"><div class="dialog">
+  <h2 id="modalTitle">Открытие кейса</h2>
+  <div class="roulette"><div class="marker"></div><div class="track" id="track"></div></div>
+  <div class="dropToggle"><button id="dropToggleBtn" type="button">Показать возможные предметы</button></div>
+  <div class="dropList" id="dropList"></div>
+  <div class="result" id="result">Нажми «Открыть», чтобы запустить рулетку</div>
+  <div class="actions"><button onclick="closeModal()">Закрыть</button><button class="primary" id="spin">Открыть за 0 DM</button></div>
+</div></div>
+
+<script>
+/* ---------- image resolution ---------- */
+// Steam market renames knives/gloves with a wear-specific hash icon that the
+// old name-guessing endpoint could not resolve. We load the official CS2
+// skin dataset once and match by exact market_hash_name; steamapis.com is
+// kept only as a same-request fallback while the dataset is loading.
+let imageMap=null;
+const imageMapPromise=fetch("https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/skins_not_grouped.json")
+  .then(r=>r.json())
+  .then(data=>{
+    imageMap=new Map();
+    data.forEach(s=>{ if(s.market_hash_name && s.image) imageMap.set(s.market_hash_name, s.image); });
+    refreshAllImages();
+  })
+  .catch(()=>{ imageMap=new Map(); });
+
+function fallbackSteamImg(name){ return "https://api.steamapis.com/image/item/730/"+encodeURIComponent(name); }
+function itemImg(name){ return (imageMap && imageMap.get(name)) || fallbackSteamImg(name); }
+function refreshAllImages(){
+  document.querySelectorAll("img[data-iname]").forEach(img=>{
+    const found=imageMap && imageMap.get(img.dataset.iname);
+    if(found && img.src!==found){ img.style.opacity="1"; img.src=found; }
+  });
+}
+function imgTag(name,cls){
+  const safe=name.replace(/"/g,"&quot;");
+  return `<img${cls?` class="${cls}"`:""} src="${itemImg(name)}" data-iname="${safe}" alt="${safe}" loading="lazy" onerror="this.style.opacity='0'">`;
+}
+function shortName(name){ return name.replace(/\s*\(.*\)$/,""); }
+
+/* ---------- cases ---------- */
+const cases=[
+["Неон","AK-47 | Slate (Field-Tested)",49,"cheap"],["Кобальт","USP-S | Cortex (Field-Tested)",79,"cheap"],["Вулкан","Glock-18 | Vogue (Field-Tested)",99,"cheap"],["Кибер","M4A1-S | Player Two (Field-Tested)",149,"rare"],["Оникс","AWP | Hyper Beast (Field-Tested)",249,"rare"],
+["Феникс","AK-47 | Redline (Field-Tested)",399,"rare"],["Импульс","AWP | Asiimov (Field-Tested)",599,"rare"],["Император","M4A4 | The Emperor (Field-Tested)",999,"rare"],["Квант","AWP | Neo-Noir (Field-Tested)",1499,"rare"],["Легенда","AK-47 | Fire Serpent (Field-Tested)",2499,"rare"],
+["Астра","M4A1-S | Decimator (Field-Tested)",69,"cheap"],["Самурай","AK-47 | Ice Coaled (Field-Tested)",129,"rare"],["Титан","M4A1-S | Printstream (Field-Tested)",499,"rare"],["Призма","Desert Eagle | Printstream (Field-Tested)",799,"rare"],["Золотой","AWP | Lightning Strike (Factory New)",1999,"rare"]
+];
+
+/* ---------- weighted drop pool ---------- */
+// Regular skins make up the vast majority of the weight; knives/gloves are
+// individually ~0.3% (about 2.5% combined) and priced far above any regular
+// skin, so they read as the rare, expensive drop they're meant to be.
+const regularDrops=[
+  {name:"AK-47 | Slate (Field-Tested)",rarity:"consumer",weight:20,min:8,max:20},
+  {name:"USP-S | Cortex (Field-Tested)",rarity:"consumer",weight:20,min:10,max:25},
+  {name:"Glock-18 | Vogue (Field-Tested)",rarity:"industrial",weight:16,min:15,max:40},
+  {name:"Desert Eagle | Printstream (Field-Tested)",rarity:"restricted",weight:9,min:150,max:320},
+  {name:"M4A1-S | Printstream (Field-Tested)",rarity:"restricted",weight:10,min:120,max:260},
+  {name:"AK-47 | Redline (Field-Tested)",rarity:"classified",weight:6,min:180,max:420},
+  {name:"AWP | Asiimov (Field-Tested)",rarity:"classified",weight:6,min:250,max:520},
+  {name:"M4A4 | The Emperor (Field-Tested)",rarity:"classified",weight:5,min:400,max:800},
+  {name:"AWP | Neo-Noir (Field-Tested)",rarity:"covert",weight:3,min:700,max:1500},
+  {name:"AK-47 | Fire Serpent (Field-Tested)",rarity:"covert",weight:3,min:900,max:1800}
+];
+const specialDrops=[
+  {name:"★ Karambit | Doppler (Factory New)",rarity:"special",weight:.35,min:3200,max:5400},
+  {name:"★ Butterfly Knife | Fade (Factory New)",rarity:"special",weight:.3,min:3600,max:6000},
+  {name:"★ M9 Bayonet | Lore (Minimal Wear)",rarity:"special",weight:.35,min:2400,max:4200},
+  {name:"★ Bayonet | Autotronic (Factory New)",rarity:"special",weight:.3,min:2600,max:4600},
+  {name:"★ Sport Gloves | Vice (Field-Tested)",rarity:"special",weight:.3,min:2800,max:4800},
+  {name:"★ Specialist Gloves | Fade (Minimal Wear)",rarity:"special",weight:.25,min:3000,max:5200},
+  {name:"★ Driver Gloves | King Snake (Field-Tested)",rarity:"special",weight:.35,min:1800,max:3200},
+  {name:"★ Hand Wraps | Cobalt Skulls (Field-Tested)",rarity:"special",weight:.4,min:1400,max:2600}
+];
+const dropPool=[...regularDrops,...specialDrops];
+const dropWeightTotal=dropPool.reduce((s,x)=>s+x.weight,0);
+const rarityColor={consumer:"#b0c3d9",industrial:"#5e98d9",milspec:"#4b69ff",restricted:"#8847ff",classified:"#d32ce6",covert:"#eb4b4b",special:"#ffd700"};
+function weightedPick(){
+  let r=Math.random()*dropWeightTotal;
+  for(const it of dropPool){ if((r-=it.weight)<=0) return it; }
+  return dropPool[dropPool.length-1];
+}
+function priceFor(entry){ return Math.round((entry.min+Math.random()*(entry.max-entry.min))/5)*5; }
+
+let balance=10000,current=null,invId=1;
+let inventory=[];
+const fmt=n=>n.toLocaleString("ru-RU");
+function updateBalance(){document.getElementById("balance").textContent=fmt(balance)}
+
+function render(list=cases){grid.innerHTML="";list.forEach((c)=>{const d=document.createElement("article");d.className="card";d.dataset.cat=c[3];d.innerHTML=`<div class="caseArt">${imgTag(c[1])}<span class="caseBadge">CS2</span></div><div class="name">${c[0]} <span class="price">${fmt(c[2])} DM</span></div><div class="meta">Скины CS2 · виртуальные награды</div><button class="open">Открыть</button>`;d.querySelector("button").onclick=()=>openCase(c);grid.appendChild(d)});empty.style.display=list.length?"none":"block"}
+
+function renderDropList(){
+  const sorted=[...dropPool].sort((a,b)=>a.min-b.min);
+  dropList.innerHTML=sorted.map(it=>{
+    const chance=it.weight/dropWeightTotal*100;
+    const chanceStr=chance<1?chance.toFixed(2)+"%":chance.toFixed(1)+"%";
+    return `<div class="dropItem" style="border-left-color:${rarityColor[it.rarity]}">${imgTag(it.name)}<span class="dropName">${shortName(it.name)}</span><span class="dropPrice">${fmt(it.min)}–${fmt(it.max)} DM</span><span class="dropChance" style="color:${rarityColor[it.rarity]}">${chanceStr}</span></div>`;
+  }).join("");
+}
+dropToggleBtn.onclick=()=>{
+  const on=dropList.classList.toggle("on");
+  dropToggleBtn.textContent=on?"Скрыть возможные предметы":"Показать возможные предметы";
+};
+
+function buildReel(){
+  // Reset with transitions disabled, force a reflow, then re-enable — this
+  // guarantees the strip always starts from 0 and the next transform change
+  // is treated as a fresh animation, even on repeated "Открыть ещё" clicks.
+  track.style.transition="none";
+  track.style.transform="translateX(0)";
+  track.innerHTML="";
+  for(let i=0;i<18;i++){
+    const p=weightedPick();
+    track.innerHTML+=`<div class="item">${imgTag(p.name)}<span>${shortName(p.name)}</span></div>`;
+  }
+  void track.offsetWidth;
+  track.style.transition="";
+}
+function openCase(c){
+  if(balance<c[2]){alert("Недостаточно демо-монет.");return}
+  current=c;
+  modalTitle.textContent=`${c[0]} — открытие`;
+  spin.textContent=`Открыть за ${fmt(c[2])} DM`;
+  spin.disabled=false;
+  result.textContent="Нажми «Открыть», чтобы запустить рулетку";
+  dropList.classList.remove("on");
+  dropToggleBtn.textContent="Показать возможные предметы";
+  buildReel();
+  modal.classList.add("on");
+}
+function closeModal(){modal.classList.remove("on")}
+spin.onclick=()=>{
+  if(!current)return;
+  balance-=current[2];updateBalance();
+  spin.disabled=true;
+  buildReel();
+  const winEntry=weightedPick();
+  requestAnimationFrame(()=>{requestAnimationFrame(()=>{track.style.transform="translateX(-1260px)";})});
+  setTimeout(()=>{
+    const price=priceFor(winEntry);
+    const item={id:invId++,name:winEntry.name,price,rarity:winEntry.rarity};
+    inventory.push(item);
+    renderInventory();
+    const star=winEntry.rarity==="special"?" ★":"";
+    result.innerHTML=`Ты получил <b>${shortName(winEntry.name)}</b>${star} · ${fmt(price)} DM — предмет добавлен в инвентарь 🎉`;
+    spin.disabled=false;
+    spin.textContent=`Открыть ещё за ${fmt(current[2])} DM`;
+  },2450);
+};
+search.oninput=()=>{const q=search.value.toLowerCase();render(cases.filter(c=>c[0].toLowerCase().includes(q)))}
+document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{const f=b.dataset.filter;render(f==="all"?cases:cases.filter(c=>f==="cheap"?c[2]<=100:c[3]==="rare"))})
+
+/* ---------- clicker ---------- */
+const clickerZone=document.getElementById("bonus"),comboTag=document.getElementById("comboTag"),clickHint=document.getElementById("clickHint");
+let lastClick=0,combo=0;
+clickerZone.addEventListener("click",(e)=>{
+  const now=Date.now();
+  combo=(now-lastClick<650)?Math.min(combo+1,10):0;
+  lastClick=now;
+  const base=15+Math.floor(Math.random()*20);
+  const multiplier=1+combo*0.15;
+  const gain=Math.round(base*multiplier);
+  balance+=gain;updateBalance();
+  const rect=clickerZone.getBoundingClientRect();
+  const f=document.createElement("div");
+  f.className="floatCoin";
+  f.style.left=(e.clientX-rect.left)+"px";
+  f.style.top=(e.clientY-rect.top)+"px";
+  f.textContent="+"+gain;
+  clickerZone.appendChild(f);
+  setTimeout(()=>f.remove(),750);
+  comboTag.textContent=combo>0?`Комбо ×${multiplier.toFixed(2)}`:"";
+  clickHint.textContent="Нажми ещё раз";
+});
+
+/* ---------- inventory ---------- */
+const invGrid=document.getElementById("invGrid"),invEmpty=document.getElementById("invEmpty"),invTotal=document.getElementById("invTotal"),invCount=document.getElementById("invCount");
+function renderInventory(){
+  invGrid.innerHTML="";
+  invEmpty.style.display=inventory.length?"none":"block";
+  let total=0;
+  inventory.forEach(it=>{
+    total+=it.price;
+    const d=document.createElement("div");
+    d.className="invCard";
+    d.style.borderLeftColor=rarityColor[it.rarity]||"var(--line)";
+    d.innerHTML=`<div class="invArt">${imgTag(it.name)}</div><div class="invName">${shortName(it.name)}</div><div class="invPrice">${fmt(it.price)} DM</div><button class="sellBtn">Продать за ${fmt(it.price)} DM</button>`;
+    d.querySelector(".sellBtn").onclick=()=>sellItem(it.id);
+    invGrid.appendChild(d);
+  });
+  invTotal.textContent=fmt(total);
+  invCount.textContent=inventory.length;
+  renderUpgradeOptions();
+  renderContractPicker();
+}
+function sellItem(id){
+  const idx=inventory.findIndex(x=>x.id===id);
+  if(idx<0)return;
+  balance+=inventory[idx].price;
+  inventory.splice(idx,1);
+  updateBalance();
+  renderInventory();
+}
+
+/* ---------- upgrade ---------- */
+const upgradeSelect=document.getElementById("upgradeSelect"),btnUpgrade=document.getElementById("btnUpgrade"),upgradeChance=document.getElementById("upgradeChance"),upgradeTarget=document.getElementById("upgradeTarget"),upgradeResult=document.getElementById("upgradeResult");
+let upgradePickId=null,upgradeMult=2;
+function renderUpgradeOptions(){
+  const keep=upgradePickId;
+  upgradeSelect.innerHTML='<option value="">— выбери предмет —</option>'+inventory.map(it=>`<option value="${it.id}">${shortName(it.name)} · ${fmt(it.price)} DM</option>`).join("");
+  if(inventory.some(x=>x.id===keep)){upgradeSelect.value=keep;upgradePickId=keep}else{upgradePickId=null}
+  updateUpgradePreview();
+}
+upgradeSelect.onchange=()=>{upgradePickId=upgradeSelect.value?Number(upgradeSelect.value):null;updateUpgradePreview();}
+document.querySelectorAll(".multBtn").forEach(b=>b.onclick=()=>{document.querySelectorAll(".multBtn").forEach(x=>x.classList.remove("active"));b.classList.add("active");upgradeMult=Number(b.dataset.mult);updateUpgradePreview();});
+function chanceFor(mult){return Math.max(6,Math.min(88,Math.round(78/mult)))}
+function updateUpgradePreview(){
+  const it=inventory.find(x=>x.id===upgradePickId);
+  if(!it){upgradeChance.textContent="—";upgradeTarget.textContent="—";btnUpgrade.disabled=true;return}
+  const chance=chanceFor(upgradeMult);
+  upgradeChance.textContent=chance+"%";
+  upgradeTarget.textContent=fmt(Math.round(it.price*upgradeMult))+" DM";
+  btnUpgrade.disabled=false;
+}
+btnUpgrade.onclick=()=>{
+  const it=inventory.find(x=>x.id===upgradePickId);
+  if(!it)return;
+  btnUpgrade.disabled=true;
+  upgradeResult.textContent="Апгрейд запущен…";
+  const fx=document.getElementById("upgradeFx");
+  const fxItem=document.getElementById("upgradeFxItem");
+  fxItem.innerHTML=`${imgTag(it.name)}<span>${shortName(it.name)}</span>`;
+  fx.classList.remove("on"); void fx.offsetWidth; fx.classList.add("on");
+  const chance=chanceFor(upgradeMult);
+  setTimeout(()=>{
+    const idx=inventory.findIndex(x=>x.id===it.id);
+    if(idx<0)return;
+    const win=Math.random()*100<chance;
+    if(win){
+      const pool=[...regularDrops,...specialDrops];
+      const target=pool[Math.floor(Math.random()*pool.length)];
+      const newPrice=Math.round(it.price*upgradeMult);
+      inventory[idx]={id:invId++,name:target.name,price:newPrice,rarity:target.rarity};
+      fxItem.innerHTML=`${imgTag(target.name)}<span>${shortName(target.name)}</span>`;
+      upgradeResult.innerHTML=`Успех! Получен <b>${shortName(target.name)}</b> · ${fmt(newPrice)} DM`;
+    }else{
+      inventory.splice(idx,1);
+      fxItem.innerHTML=`<span style="font-size:38px">✕</span><span>Неудача</span>`;
+      upgradeResult.textContent="Неудача — предмет потерян.";
+    }
+    setTimeout(()=>fx.classList.remove("on"),900);
+    upgradePickId=null;
+    renderInventory();
+  },1400);
+}
+
+/* ---------- contracts ---------- */
+const contractGrid=document.getElementById("contractGrid"),contractEmpty=document.getElementById("contractEmpty"),contractCount=document.getElementById("contractCount"),btnContract=document.getElementById("btnContract"),contractResult=document.getElementById("contractResult");
+let contractSel=new Set();
+function renderContractPicker(){
+  contractGrid.innerHTML="";
+  contractEmpty.style.display=inventory.length?"none":"block";
+  inventory.forEach(it=>{
+    const picked=contractSel.has(it.id);
+    const d=document.createElement("label");
+    d.className="contractItem"+(picked?" picked":"");
+    d.innerHTML=`<input type="checkbox" ${picked?"checked":""}>${imgTag(it.name)}<span>${shortName(it.name)}</span><small>${fmt(it.price)} DM</small>`;
+    d.querySelector("input").onchange=(e)=>{
+      if(e.target.checked){
+        if(contractSel.size>=5){e.target.checked=false;return}
+        contractSel.add(it.id);
+      }else{
+        contractSel.delete(it.id);
+      }
+      renderContractPicker();
+    };
+    contractGrid.appendChild(d);
+  });
+  contractCount.textContent=contractSel.size;
+  btnContract.disabled=contractSel.size!==5;
+}
+btnContract.onclick=()=>{
+  const chosen=inventory.filter(x=>contractSel.has(x.id));
+  if(chosen.length!==5)return;
+  btnContract.disabled=true;
+  contractResult.textContent="Предметы объединяются…";
+  const fx=document.getElementById("contractFx");
+  const fxItem=document.getElementById("contractFxItem");
+  fxItem.innerHTML=chosen.map(x=>`<img src="${itemImg(x.name)}" alt="${shortName(x.name)}" style="width:38px;height:28px">`).join("");
+  fx.classList.remove("on"); void fx.offsetWidth; fx.classList.add("on");
+  setTimeout(()=>{
+    const avg=chosen.reduce((s,x)=>s+x.price,0)/chosen.length;
+    const newPrice=Math.round(avg*1.5/5)*5;
+    const pool=[...regularDrops,...specialDrops];
+    const target=pool[Math.floor(Math.random()*pool.length)];
+    inventory=inventory.filter(x=>!contractSel.has(x.id));
+    const newItem={id:invId++,name:target.name,price:newPrice,rarity:target.rarity};
+    inventory.push(newItem);
+    contractSel.clear();
+    fxItem.innerHTML=`${imgTag(target.name)}<span>${shortName(target.name)}</span>`;
+    contractResult.innerHTML=`Контракт выполнен! Получен <b>${shortName(target.name)}</b> · ${fmt(newPrice)} DM`;
+    setTimeout(()=>fx.classList.remove("on"),1000);
+    renderInventory();
+  },1600);
+}
+
+render();
+renderDropList();
+renderInventory();
+</script>
+</body>
+</html>
