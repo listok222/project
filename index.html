@@ -94,10 +94,40 @@ select{background:#171d27;border:1px solid var(--line);color:#fff;border-radius:
 .upgradeFx.on,.contractFx.on{display:flex}
 .fxItem{width:130px;height:100px;border-radius:12px;background:#171d27;border:1px solid #394254;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;position:absolute}
 .fxItem img{width:90px;height:60px;object-fit:contain;filter:drop-shadow(0 8px 10px #0008)}
-.upgradeFx.on .fxItem{animation:upgradeSpin 1.35s cubic-bezier(.2,.8,.2,1)}
-@keyframes upgradeSpin{0%{transform:translateX(-200px) rotate(-12deg) scale(.7);opacity:0}35%{opacity:1}65%{transform:translateX(0) rotate(8deg) scale(1.08)}100%{transform:translateX(0) rotate(0) scale(1)}}
-.contractFx.on .fxItem{animation:contractForge 1.55s cubic-bezier(.15,.75,.2,1)}
-@keyframes contractForge{0%{transform:scale(.35) rotate(-25deg);opacity:0;filter:brightness(2)}45%{transform:scale(1.18) rotate(8deg);opacity:1;filter:brightness(1.8)}75%{transform:scale(.94) rotate(-3deg)}100%{transform:scale(1) rotate(0);filter:brightness(1)}}
+/* upgrade chance bar */
+.upBarWrap{margin-top:14px;display:none}
+.upBarWrap.on{display:block}
+.upBarTrack{position:relative;height:36px;border-radius:10px;background:linear-gradient(90deg,#3a1520,#2a1218);border:1px solid var(--line);overflow:hidden}
+.upBarZone{position:absolute;top:0;bottom:0;left:0;background:linear-gradient(90deg,#1a5c3a,#35d07f88);border-right:2px solid var(--green);transition:width .25s}
+.upBarZoneLabel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;text-shadow:0 1px 4px #000;pointer-events:none;z-index:2}
+.upBarNeedle{position:absolute;top:-4px;bottom:-4px;width:3px;background:#fff;box-shadow:0 0 10px #fff,0 0 4px var(--accent);left:0;z-index:3;border-radius:2px}
+.upBarNeedle::before{content:"";position:absolute;top:-8px;left:50%;transform:translateX(-50%);border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--gold)}
+.upBarNeedle.spinning{transition:left 2.4s cubic-bezier(.08,.7,.12,1)}
+.upBoostRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:flex-end}
+.upBoostRow .field{flex:1;min-width:140px}
+.upBoostRow input[type=number]{background:#171d27;border:1px solid var(--line);color:#fff;border-radius:9px;padding:11px 12px;width:100%;min-height:44px;font-size:14px}
+.upExtraGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px;margin-top:8px;max-height:140px;overflow-y:auto}
+.upExtraItem{background:#171d27;border:1px solid var(--line);border-radius:8px;padding:6px;text-align:center;cursor:pointer;font-size:10px}
+.upExtraItem img{width:100%;height:28px;object-fit:contain}
+.upExtraItem.picked{border-color:var(--accent);background:#1d1a33}
+.upExtraItem small{color:var(--gold);display:block}
+.contractFx{flex-direction:column;gap:8px}
+.contractFx .fxOrbit{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.contractFx .fxChip{position:absolute;width:48px;height:36px;border-radius:8px;background:#171d27;border:1px solid #394254;display:flex;align-items:center;justify-content:center;opacity:0}
+.contractFx .fxChip img{width:40px;height:28px;object-fit:contain}
+.contractFx.on .fxChip{animation:contractOrbit 1.8s ease-in-out forwards}
+.contractFx.on .fxItem{animation:contractReveal 1.8s cubic-bezier(.15,.75,.2,1) forwards}
+@keyframes contractOrbit{
+  0%{opacity:1;transform:rotate(var(--rot)) translateX(90px) rotate(calc(-1*var(--rot))) scale(.6)}
+  55%{opacity:1;transform:rotate(calc(var(--rot) + 360deg)) translateX(20px) rotate(calc(-1*var(--rot) - 360deg)) scale(.85)}
+  100%{opacity:0;transform:rotate(calc(var(--rot) + 420deg)) translateX(0) rotate(calc(-1*var(--rot) - 420deg)) scale(.2)}
+}
+@keyframes contractReveal{
+  0%{transform:scale(0);opacity:0;filter:brightness(3)}
+  50%{transform:scale(0);opacity:0}
+  70%{transform:scale(1.25);opacity:1;filter:brightness(1.8)}
+  100%{transform:scale(1);opacity:1;filter:brightness(1)}
+}
 .fxRing{position:absolute;width:180px;height:180px;border:2px solid #7c5cff55;border-radius:50%;animation:ringPulse 1.3s ease-out infinite}
 @keyframes ringPulse{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.35);opacity:0}}
 
@@ -133,7 +163,7 @@ select{background:#171d27;border:1px solid var(--line);color:#fff;border-radius:
 .track{display:flex;gap:10px;position:absolute;left:0;transform:translateX(0);transition:transform 2.4s cubic-bezier(.12,.8,.12,1);will-change:transform}
 .item{min-width:110px;height:100px;border:1px solid var(--line);border-radius:10px;background:#171d27;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;flex-shrink:0}
 .item img{width:88px;height:66px;object-fit:contain;filter:drop-shadow(0 6px 6px #0008);transition:opacity .2s}
-.item span{font-size:11px;text-align:center;padding:0 4px;line-height:1.2}
+.rarityDot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;box-shadow:0 0 6px currentColor}.item{position:relative}.item span{font-size:11px;text-align:center;padding:0 4px;line-height:1.2}
 .marker{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;box-shadow:0 0 12px #fff;z-index:2}
 .result{text-align:center;margin:12px 0;font-size:15px;line-height:1.4;min-height:44px}
 .actions{display:flex;gap:8px}
@@ -189,6 +219,31 @@ footer{max-width:1240px;margin:auto;padding:0 14px 16px;color:#687487;border-top
   .modal{align-items:center;padding:18px}
   .dialog{border-radius:18px;max-height:90vh;padding:22px}
 }
+
+.upModernGrid{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:14px;align-items:start}
+@media(max-width:900px){.upModernGrid{grid-template-columns:1fr}}
+.upColTitle{font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:700}
+.upSelected{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;min-height:70px;background:#0f141c;border:1px dashed var(--line);border-radius:10px;padding:8px}
+.upPickGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:180px;overflow-y:auto;margin-top:8px}
+.upPickItem{background:#171d27;border:1px solid var(--line);border-radius:8px;padding:6px;text-align:center;cursor:pointer;font-size:10px}
+.upPickItem img{width:100%;height:32px;object-fit:contain}
+.upPickItem.picked{border-color:var(--accent);background:#1d1a33}
+.upPickItem small{color:var(--gold);display:block}
+.upSum{margin-top:8px;font-size:13px}.upSum b{color:var(--gold)}
+.upColHint{font-size:11px;color:var(--muted);margin-top:6px}
+.upColCenter{display:flex;flex-direction:column;align-items:center}
+.upRingWrap{position:relative;width:160px;height:160px;margin:0 auto}
+.upRingSvg{width:160px;height:160px}
+.upRingCenter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.upRingCenter b{font-size:22px;font-weight:900}
+.upRingCenter small{color:var(--muted);font-size:11px}
+.upArrow{position:absolute;top:-2px;left:50%;transform:translateX(-50%);color:var(--gold);font-size:16px;z-index:2;text-shadow:0 0 8px #000;transition:transform 2.4s cubic-bezier(.08,.7,.12,1);transform-origin:50% 82px}
+.upArrow.spinning{transition:transform 2.6s cubic-bezier(.08,.75,.1,1)}
+.upTargetBox{background:#0f141c;border:1px solid var(--line);border-radius:12px;min-height:140px;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:12px;text-align:center}
+.upTargetBox img{max-width:120px;max-height:80px;object-fit:contain}
+.upTargetEmpty{color:var(--muted);font-size:12px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+
 </style>
 </head>
 <body>
@@ -201,7 +256,7 @@ footer{max-width:1240px;margin:auto;padding:0 14px 16px;color:#687487;border-top
     <a href="#contracts">Контракты</a>
     <a href="#bonus">Бонусы</a>
   </div>
-  <div class="wallet">Баланс: <span class="balance" id="balance">10 000</span> DM</div>
+  <div class="wallet">Баланс: <span class="balance" id="balance">50 000</span> DM</div>
 </nav></header>
 
 <main>
@@ -227,7 +282,7 @@ footer{max-width:1240px;margin:auto;padding:0 14px 16px;color:#687487;border-top
 
 <section id="cases" class="section">
   <h2>Популярные кейсы</h2>
-  <p class="sectionHint">Открывай кейсы за демо-монеты — предметы попадают в инвентарь. Ножи и перчатки — редкий и дорогой дроп.</p>
+  <p class="sectionHint">Кейсы с пулами как в CS2 (шансы официальные). Цены предметов — ориентир по Steam Market (демо, не live). ★ Ножевой кейс за 10 000 — ножи, перчатки и Dragon Lore.</p>
   <div id="grid" class="grid"></div>
   <div id="empty" class="empty">Ничего не найдено</div>
 </section>
@@ -242,45 +297,76 @@ footer{max-width:1240px;margin:auto;padding:0 14px 16px;color:#687487;border-top
 
 <section id="upgrade" class="section">
   <h2>Апгрейд</h2>
-  <p class="sectionHint">Рискни предметом ради более дорогого — шанс тем ниже, чем выше множитель.</p>
-  <div class="panelBox">
-    <div class="upgradeRow">
-      <div class="field">
-        <label>Предмет из инвентаря</label>
-        <select id="upgradeSelect"><option value="">— выбери предмет —</option></select>
+  <p class="sectionHint">Выбери предметы слева, цель справа. Стрелка крутится по кольцу — зелёная зона = успех. Можно добавить DM для повышения шанса.</p>
+  <div class="panelBox upModern">
+    <div class="upModernGrid">
+      <div class="upCol">
+        <div class="upColTitle">Выбранные предметы</div>
+        <div id="upSelected" class="upSelected"></div>
+        <div class="upColHint">Тапни предмет в списке ниже</div>
+        <div id="upPickGrid" class="upPickGrid"></div>
+        <div class="upSum">Сумма: <b id="upSumVal">0</b> DM</div>
       </div>
-      <div class="field">
-        <label>Множитель</label>
-        <div class="multRow">
+      <div class="upCol upColCenter">
+        <div class="upRingWrap">
+          <div class="upArrow">▼</div>
+          <svg class="upRingSvg" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#1a212c" stroke-width="12"/>
+            <circle id="upRingBg" cx="60" cy="60" r="52" fill="none" stroke="url(#upGrad)" stroke-width="12"
+              stroke-dasharray="0 327" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+            <defs>
+              <linearGradient id="upGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#35d07f"/>
+                <stop offset="55%" stop-color="#ffd76a"/>
+                <stop offset="100%" stop-color="#ff5577"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="upRingCenter">
+            <b id="upgradeChance">—</b>
+            <small id="upChanceHint">шанс</small>
+          </div>
+        </div>
+        <div class="field" style="width:100%;margin-top:8px">
+          <label>Добавить баланс (DM)</label>
+          <input type="range" id="upgradeCashRange" min="0" max="5000" step="50" value="0">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+            <span id="upgradeCashLabel">0 DM</span>
+            <span id="upgradeCashBonus">+0%</span>
+          </div>
+        </div>
+        <div class="multRow" style="justify-content:center;margin-top:8px">
           <button type="button" class="multBtn active" data-mult="2">×2</button>
           <button type="button" class="multBtn" data-mult="3">×3</button>
           <button type="button" class="multBtn" data-mult="5">×5</button>
           <button type="button" class="multBtn" data-mult="10">×10</button>
         </div>
+        <button type="button" class="runBtn" id="btnUpgrade" disabled style="margin-top:10px">Прокачать</button>
       </div>
-      <button type="button" class="runBtn" id="btnUpgrade" disabled>Запустить апгрейд</button>
+      <div class="upCol">
+        <div class="upColTitle">Оружие, которое хотите получить</div>
+        <div id="upTargetBox" class="upTargetBox">
+          <div class="upTargetEmpty">Выбери предметы слева</div>
+        </div>
+        <div class="stat" style="margin-top:10px;width:100%"><span>Цель при успехе</span><b id="upgradeTarget">—</b></div>
+        <div class="stat" style="margin-top:8px;width:100%"><span>При неудаче</span><b style="color:var(--red)">предметы сгорают</b></div>
+      </div>
     </div>
-    <div class="upgradeStats">
-      <div class="stat"><span>Шанс успеха</span><b id="upgradeChance">—</b></div>
-      <div class="stat"><span>Цель при успехе</span><b id="upgradeTarget">—</b></div>
-      <div class="stat"><span>При неудаче</span><b style="color:var(--red)">предмет теряется</b></div>
-    </div>
-    <div class="upgradeFx" id="upgradeFx"><div class="fxRing"></div><div class="fxItem" id="upgradeFxItem"></div></div>
     <div class="upgradeResult" id="upgradeResult"></div>
   </div>
 </section>
 
 <section id="contracts" class="section">
   <h2>Контракты</h2>
-  <p class="sectionHint">Выбери ровно 5 предметов — получишь 1 новый, ценнее среднего по выбору.</p>
+  <p class="sectionHint">Выбери от 5 до 10 предметов. Новый предмет будет стоить сумму выбранных −100…+500 DM.</p>
   <div class="panelBox">
     <div id="contractGrid" class="contractGrid"></div>
     <div id="contractEmpty" class="empty2">В инвентаре пока нет предметов для контракта.</div>
     <div class="contractBar">
-      <span>Выбрано: <b id="contractCount">0</b>/5</span>
+      <span>Выбрано: <b id="contractCount">0</b>/10 <small style="color:var(--muted)">(мин. 5)</small></span>
       <button type="button" class="runBtn" id="btnContract" disabled>Собрать контракт</button>
     </div>
-    <div class="contractFx" id="contractFx"><div class="fxRing"></div><div class="fxItem" id="contractFxItem"></div></div>
+    <div class="contractFx" id="contractFx"><div class="fxRing"></div><div class="fxOrbit" id="contractOrbit"></div><div class="fxItem" id="contractFxItem"></div></div>
     <div class="upgradeResult" id="contractResult"></div>
   </div>
 </section>
@@ -312,6 +398,77 @@ footer{max-width:1240px;margin:auto;padding:0 14px 16px;color:#687487;border-top
 </div>
 
 <script>
+
+/* ---------- audio ---------- */
+let audioCtx=null;
+function ensureAudio(){
+  if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==="suspended") audioCtx.resume();
+  return audioCtx;
+}
+// Soft mechanical click (filtered noise + short tone)
+function playTick(progress=0){
+  try{
+    const ctx=ensureAudio();
+    const t=ctx.currentTime;
+    // noise burst
+    const n=ctx.createBufferSource();
+    const buf=ctx.createBuffer(1, Math.max(1, Math.floor(ctx.sampleRate*0.025)), ctx.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+    n.buffer=buf;
+    const bp=ctx.createBiquadFilter();
+    bp.type="bandpass";
+    bp.frequency.value=1800+progress*900;
+    bp.Q.value=4;
+    const g=ctx.createGain();
+    g.gain.value=0.11*(1-progress*0.35);
+    g.gain.exponentialRampToValueAtTime(0.001, t+0.04);
+    n.connect(bp); bp.connect(g); g.connect(ctx.destination);
+    n.start(t); n.stop(t+0.04);
+    // soft body click
+    const o=ctx.createOscillator(), og=ctx.createGain();
+    o.type="triangle";
+    o.frequency.value=220+progress*80;
+    og.gain.value=0.04;
+    og.gain.exponentialRampToValueAtTime(0.001, t+0.03);
+    o.connect(og); og.connect(ctx.destination);
+    o.start(t); o.stop(t+0.03);
+  }catch(e){}
+}
+function playWin(){
+  try{
+    const ctx=ensureAudio();
+    const notes=[523.25,659.25,783.99,1046.5];
+    notes.forEach((f,i)=>{
+      const t=ctx.currentTime+i*0.09;
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type="sine"; o.frequency.value=f;
+      g.gain.value=0.0001;
+      g.gain.exponentialRampToValueAtTime(0.12, t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t+0.35);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t+0.4);
+    });
+  }catch(e){}
+}
+function playLose(){
+  try{
+    const ctx=ensureAudio();
+    const t=ctx.currentTime;
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type="sawtooth";
+    o.frequency.setValueAtTime(180, t);
+    o.frequency.exponentialRampToValueAtTime(70, t+0.35);
+    g.gain.value=0.08;
+    g.gain.exponentialRampToValueAtTime(0.001, t+0.4);
+    const f=ctx.createBiquadFilter();
+    f.type="lowpass"; f.frequency.value=600;
+    o.connect(f); f.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t+0.45);
+  }catch(e){}
+}
+
 /* ---------- image resolution ---------- */
 let imageMap=null;
 const imageMapPromise=fetch("https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/skins_not_grouped.json")
@@ -333,50 +490,719 @@ function refreshAllImages(){
 }
 function imgTag(name,cls){
   const safe=name.replace(/"/g,"&quot;");
-  return `<img${cls?` class="${cls}"`:""} src="${itemImg(name)}" data-iname="${safe}" alt="${safe}" loading="lazy" onerror="this.style.opacity='0'">`;
+  const src=itemImg(name);
+  return `<img${cls?` class="${cls}"`:""} src="${src}" data-iname="${safe}" alt="${safe}" loading="lazy" onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='https://api.steamapis.com/image/item/730/'+encodeURIComponent(this.dataset.iname);}else{this.style.opacity='.35';this.style.background='#1a212c'}">`;
 }
 function shortName(name){ return name.replace(/\s*\(.*\)$/,""); }
 
 /* ---------- cases ---------- */
 const cases=[
-["Неон","AK-47 | Slate (Field-Tested)",49,"cheap"],["Кобальт","USP-S | Cortex (Field-Tested)",79,"cheap"],["Вулкан","Glock-18 | Vogue (Field-Tested)",99,"cheap"],["Кибер","M4A1-S | Player Two (Field-Tested)",149,"rare"],["Оникс","AWP | Hyper Beast (Field-Tested)",249,"rare"],
-["Феникс","AK-47 | Redline (Field-Tested)",399,"rare"],["Импульс","AWP | Asiimov (Field-Tested)",599,"rare"],["Император","M4A4 | The Emperor (Field-Tested)",999,"rare"],["Квант","AWP | Neo-Noir (Field-Tested)",1499,"rare"],["Легенда","AK-47 | Fire Serpent (Field-Tested)",2499,"rare"],
-["Астра","M4A1-S | Decimator (Field-Tested)",69,"cheap"],["Самурай","AK-47 | Ice Coaled (Field-Tested)",129,"rare"],["Титан","M4A1-S | Printstream (Field-Tested)",499,"rare"],["Призма","Desert Eagle | Printstream (Field-Tested)",799,"rare"],["Золотой","AWP | Lightning Strike (Factory New)",1999,"rare"]
+["Kilowatt","AK-47 | Inheritance (Field-Tested)",15,"cheap","kilowatt"],
+["Revolution","M4A4 | Temukau (Field-Tested)",20,"cheap","revolution"],
+["Recoil","USP-S | Printstream (Field-Tested)",25,"cheap","recoil"],
+["Snakebite","MP9 | Food Chain (Field-Tested)",35,"cheap","snakebite"],
+["Fracture","AK-47 | Legion of Anubis (Field-Tested)",40,"cheap","fracture"],
+["Clutch","MP9 | Black Sand (Field-Tested)",49,"cheap","clutch"],
+["Dreams & Nightmares","AK-47 | Nightwish (Field-Tested)",99,"rare","dreams"],
+["Prisma","AK-47 | Uncharted (Field-Tested)",110,"rare","prisma"],
+["Danger Zone","AK-47 | Asiimov (Field-Tested)",120,"rare","danger"],
+["Spectrum 2","AK-47 | The Empress (Field-Tested)",250,"rare","spectrum2"],
+["Gamma","M4A1-S | Mecha Industries (Field-Tested)",280,"rare","gamma"],
+["Chroma 2","M4A1-S | Hyper Beast (Field-Tested)",350,"rare","chroma2"],
+["Operation Breakout","P250 | Muertos (Field-Tested)",700,"rare","breakout"],
+["CS:GO Weapon Case","AWP | Lightning Strike (Factory New)",9500,"rare","weapon1"],
+["★ Редкие","AWP | Dragon Lore (Factory New)",2500,"rare","rareonly"],
+["★ Ножевой кейс","★ Karambit | Doppler (Factory New)",10000,"rare","knife"],
+];
+const casePools={
+"kilowatt":[
+{name:"Tec-9 | Slab (Field-Tested)",rarity:"milspec",weight:11.4171,min:8,max:25},
+{name:"UMP-45 | Motorized (Field-Tested)",rarity:"milspec",weight:11.4171,min:10,max:30},
+{name:"Nova | Dark Sigil (Field-Tested)",rarity:"milspec",weight:11.4171,min:8,max:22},
+{name:"SSG 08 | Dezastre (Field-Tested)",rarity:"milspec",weight:11.4171,min:12,max:35},
+{name:"XM1014 | Irezumi (Field-Tested)",rarity:"milspec",weight:11.4171,min:10,max:28},
+{name:"Dual Berettas | Hideout (Field-Tested)",rarity:"milspec",weight:11.4171,min:9,max:24},
+{name:"MAC-10 | Light Box (Field-Tested)",rarity:"milspec",weight:11.4171,min:11,max:32},
+{name:"Glock-18 | Block-18 (Field-Tested)",rarity:"restricted",weight:3.196,min:40,max:120},
+{name:"M4A4 | Etch Lord (Field-Tested)",rarity:"restricted",weight:3.196,min:50,max:150},
+{name:"Five-SeveN | Hybrid (Field-Tested)",rarity:"restricted",weight:3.196,min:35,max:90},
+{name:"MP7 | Just Smile (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:80},
+{name:"Sawed-Off | Analog Input (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"Zeus x27 | Triton (Field-Tested)",rarity:"classified",weight:1.0667,min:200,max:450},
+{name:"USP-S | Jawbreaker (Field-Tested)",rarity:"classified",weight:1.0667,min:250,max:500},
+{name:"M4A1-S | Black Lotus (Field-Tested)",rarity:"classified",weight:1.0667,min:280,max:550},
+{name:"AK-47 | Inheritance (Field-Tested)",rarity:"covert",weight:0.32,min:800,max:1800},
+{name:"AWP | Chrome Cannon (Field-Tested)",rarity:"covert",weight:0.32,min:900,max:2000},
+{name:"★ Kukri Knife | Fade (Factory New)",rarity:"special",weight:0.065,min:2800,max:4500},
+{name:"★ Kukri Knife | Slaughter (Factory New)",rarity:"special",weight:0.065,min:2200,max:3800},
+{name:"★ Kukri Knife | Case Hardened (Field-Tested)",rarity:"special",weight:0.065,min:1800,max:3200},
+{name:"★ Kukri Knife | Crimson Web (Field-Tested)",rarity:"special",weight:0.065,min:1500,max:2800},
+],
+"revolution":[
+{name:"MAG-7 | Insomnia (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"Tec-9 | Rebel (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:18},
+{name:"SG 553 | Cyberforce (Field-Tested)",rarity:"milspec",weight:11.4171,min:6,max:20},
+{name:"MP5-SD | Liquidation (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"P250 | Re.built (Field-Tested)",rarity:"milspec",weight:11.4171,min:7,max:22},
+{name:"SCAR-20 | Fragments (Field-Tested)",rarity:"milspec",weight:11.4171,min:6,max:18},
+{name:"MP9 | Featherweight (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"M4A1-S | Emphorosaur-S (Field-Tested)",rarity:"restricted",weight:3.196,min:40,max:110},
+{name:"Glock-18 | Umbral Rabbit (Field-Tested)",rarity:"restricted",weight:3.196,min:35,max:100},
+{name:"P90 | Neoqueen (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:90},
+{name:"MAC-10 | Sakkaku (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:80},
+{name:"R8 Revolver | Banana Cannon (Field-Tested)",rarity:"restricted",weight:3.196,min:28,max:85},
+{name:"UMP-45 | Wild Child (Field-Tested)",rarity:"classified",weight:1.0667,min:180,max:400},
+{name:"AWP | Duality (Field-Tested)",rarity:"classified",weight:1.0667,min:220,max:480},
+{name:"P2000 | Wicked Sick (Field-Tested)",rarity:"classified",weight:1.0667,min:160,max:350},
+{name:"AK-47 | Head Shot (Field-Tested)",rarity:"covert",weight:0.32,min:700,max:1600},
+{name:"M4A4 | Temukau (Field-Tested)",rarity:"covert",weight:0.32,min:900,max:2000},
+{name:"★ Sport Gloves | Amphibious (Field-Tested)",rarity:"special",weight:0.065,min:2500,max:4200},
+{name:"★ Specialist Gloves | Lt. Commander (Field-Tested)",rarity:"special",weight:0.065,min:1800,max:3200},
+{name:"★ Driver Gloves | Snow Leopard (Field-Tested)",rarity:"special",weight:0.065,min:1600,max:2800},
+{name:"★ Hand Wraps | CAUTION! (Field-Tested)",rarity:"special",weight:0.065,min:1200,max:2200},
+],
+"recoil":[
+{name:"FAMAS | Meow 36 (Field-Tested)",rarity:"milspec",weight:11.4171,min:8,max:25},
+{name:"Galil AR | Destroyer (Field-Tested)",rarity:"milspec",weight:11.4171,min:7,max:22},
+{name:"Negev | Drop Me (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"P250 | Visions (Field-Tested)",rarity:"milspec",weight:11.4171,min:10,max:30},
+{name:"UMP-45 | Roadblock (Field-Tested)",rarity:"milspec",weight:11.4171,min:6,max:18},
+{name:"MAC-10 | Monkeyflage (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"G3SG1 | Dream Glade (Field-Tested)",rarity:"milspec",weight:11.4171,min:6,max:20},
+{name:"Dual Berettas | Melondrama (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:90},
+{name:"R8 Revolver | Crazy 8 (Field-Tested)",rarity:"restricted",weight:3.196,min:35,max:100},
+{name:"SG 553 | Dragon Tech (Field-Tested)",rarity:"restricted",weight:3.196,min:40,max:110},
+{name:"P90 | Vent Rush (Field-Tested)",rarity:"restricted",weight:3.196,min:28,max:85},
+{name:"M249 | Downtown (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"Sawed-Off | Kiss♥Love (Field-Tested)",rarity:"classified",weight:1.0667,min:150,max:350},
+{name:"USP-S | Printstream (Field-Tested)",rarity:"classified",weight:1.0667,min:200,max:450},
+{name:"AK-47 | Ice Coaled (Field-Tested)",rarity:"classified",weight:1.0667,min:180,max:400},
+{name:"AWP | Chromatic Aberration (Field-Tested)",rarity:"covert",weight:0.32,min:600,max:1400},
+{name:"USP-S | The Traitor (Field-Tested)",rarity:"covert",weight:0.32,min:500,max:1200},
+{name:"★ Broken Fang Gloves | Jade (Field-Tested)",rarity:"special",weight:0.065,min:2000,max:3800},
+{name:"★ Moto Gloves | Finish Line (Field-Tested)",rarity:"special",weight:0.065,min:1500,max:2800},
+{name:"★ Specialist Gloves | Field Agent (Field-Tested)",rarity:"special",weight:0.065,min:1700,max:3000},
+{name:"★ Driver Gloves | Black Tie (Field-Tested)",rarity:"special",weight:0.065,min:1400,max:2500},
+],
+"snakebite":[
+{name:"SG 553 | Heavy Metal (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:18},
+{name:"Glock-18 | Clear Polymer (Field-Tested)",rarity:"milspec",weight:11.4171,min:8,max:25},
+{name:"M249 | O.S.I.P.R. (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"CZ75-Auto | Circaetus (Field-Tested)",rarity:"milspec",weight:11.4171,min:6,max:20},
+{name:"R8 Revolver | Junk Yard (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"UMP-45 | Oscillator (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"Nova | Windblown (Field-Tested)",rarity:"milspec",weight:11.4171,min:4,max:12},
+{name:"MP9 | Food Chain (Field-Tested)",rarity:"restricted",weight:3.196,min:40,max:120},
+{name:"Galil AR | Chromatic Aberration (Field-Tested)",rarity:"restricted",weight:3.196,min:35,max:100},
+{name:"XM1014 | XOXO (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:90},
+{name:"MAC-10 | Button Up (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"Desert Eagle | Trigger Discipline (Field-Tested)",rarity:"restricted",weight:3.196,min:45,max:130},
+{name:"USP-S | The Traitor (Field-Tested)",rarity:"classified",weight:1.0667,min:200,max:450},
+{name:"M4A4 | In Living Color (Field-Tested)",rarity:"classified",weight:1.0667,min:250,max:550},
+{name:"AK-47 | Slate (Field-Tested)",rarity:"classified",weight:1.0667,min:80,max:180},
+{name:"SSG 08 | Turbo Peek (Field-Tested)",rarity:"covert",weight:0.32,min:400,max:900},
+{name:"AK-47 | Legion of Anubis (Field-Tested)",rarity:"covert",weight:0.32,min:500,max:1100},
+{name:"★ Broken Fang Gloves | Unhinged (Field-Tested)",rarity:"special",weight:0.065,min:1800,max:3400},
+{name:"★ Sport Gloves | Slingshot (Field-Tested)",rarity:"special",weight:0.065,min:2200,max:4000},
+{name:"★ Hand Wraps | Giraffe (Field-Tested)",rarity:"special",weight:0.065,min:1100,max:2000},
+{name:"★ Driver Gloves | Rezan the Red (Field-Tested)",rarity:"special",weight:0.065,min:1300,max:2400},
+],
+"fracture":[
+{name:"P250 | Cassette (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"P90 | Freight (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"PP-Bizon | Runic (Field-Tested)",rarity:"milspec",weight:11.4171,min:4,max:12},
+{name:"Tec-9 | Brother (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:18},
+{name:"SG 553 | Ol' Rusty (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"Negev | Prototype (Field-Tested)",rarity:"milspec",weight:11.4171,min:4,max:12},
+{name:"SSG 08 | Mainframe 001 (Field-Tested)",rarity:"milspec",weight:11.4171,min:6,max:20},
+{name:"MAG-7 | Monster Call (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"Galil AR | Connexion (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:85},
+{name:"MP5-SD | Kitbash (Field-Tested)",rarity:"restricted",weight:3.196,min:28,max:80},
+{name:"MAC-10 | Allure (Field-Tested)",rarity:"restricted",weight:3.196,min:35,max:100},
+{name:"XM1014 | Entombed (Field-Tested)",rarity:"restricted",weight:3.196,min:40,max:110},
+{name:"Glock-18 | Vogue (Field-Tested)",rarity:"classified",weight:1.0667,min:80,max:200},
+{name:"M4A4 | Tooth Fairy (Field-Tested)",rarity:"classified",weight:1.0667,min:120,max:280},
+{name:"AK-47 | Legion of Anubis (Field-Tested)",rarity:"classified",weight:1.0667,min:180,max:400},
+{name:"Desert Eagle | Printstream (Field-Tested)",rarity:"covert",weight:0.32,min:250,max:550},
+{name:"M4A1-S | Printstream (Field-Tested)",rarity:"covert",weight:0.32,min:300,max:650},
+{name:"★ Survival Knife | Fade (Factory New)",rarity:"special",weight:0.065,min:2000,max:3500},
+{name:"★ Paracord Knife | Slaughter (Factory New)",rarity:"special",weight:0.065,min:1800,max:3200},
+{name:"★ Nomad Knife | Case Hardened (Field-Tested)",rarity:"special",weight:0.065,min:1600,max:3000},
+{name:"★ Skeleton Knife | Crimson Web (Field-Tested)",rarity:"special",weight:0.065,min:2500,max:4500},
+],
+"clutch":[
+{name:"PP-Bizon | Night Riot (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"Five-SeveN | Flame Test (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"MP9 | Black Sand (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"P2000 | Urban Hazard (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:18},
+{name:"R8 Revolver | Grip (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"SG 553 | Aloha (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"XM1014 | Oxide Blaze (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"Glock-18 | Moonrise (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:90},
+{name:"Negev | Lionfish (Field-Tested)",rarity:"restricted",weight:3.196,min:20,max:60},
+{name:"Nova | Wild Six (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"MAG-7 | SWAG-7 (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"UMP-45 | Arctic Wolf (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:85},
+{name:"AUG | Stymphalian (Field-Tested)",rarity:"classified",weight:1.0667,min:100,max:250},
+{name:"USP-S | Cortex (Field-Tested)",rarity:"classified",weight:1.0667,min:80,max:200},
+{name:"AWP | Mortis (Field-Tested)",rarity:"classified",weight:1.0667,min:150,max:350},
+{name:"MP7 | Bloodsport (Field-Tested)",rarity:"covert",weight:0.32,min:200,max:500},
+{name:"M4A4 | Neo-Noir (Field-Tested)",rarity:"covert",weight:0.32,min:350,max:800},
+{name:"★ Hand Wraps | Cobalt Skulls (Field-Tested)",rarity:"special",weight:0.065,min:1400,max:2600},
+{name:"★ Specialist Gloves | Fade (Minimal Wear)",rarity:"special",weight:0.065,min:3000,max:5200},
+{name:"★ Sport Gloves | Vice (Field-Tested)",rarity:"special",weight:0.065,min:2800,max:4800},
+{name:"★ Driver Gloves | King Snake (Field-Tested)",rarity:"special",weight:0.065,min:1800,max:3200},
+],
+"dreams":[
+{name:"MAG-7 | Foresight (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"SCAR-20 | Enforcer (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"Sawed-Off | Spirit Board (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"P2000 | Lifted Spirits (Field-Tested)",rarity:"milspec",weight:11.4171,min:6,max:20},
+{name:"MP5-SD | Necro Jr. (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:18},
+{name:"MAC-10 | Ensnared (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"Five-SeveN | Scrawl (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"XM1014 | Zombie Offensive (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:90},
+{name:"PP-Bizon | Space Cat (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"G3SG1 | Dream Glade (Field-Tested)",rarity:"restricted",weight:3.196,min:28,max:80},
+{name:"USP-S | Ticket to Hell (Field-Tested)",rarity:"restricted",weight:3.196,min:40,max:110},
+{name:"Dual Berettas | Melondrama (Field-Tested)",rarity:"restricted",weight:3.196,min:35,max:100},
+{name:"FAMAS | Rapid Eye Movement (Field-Tested)",rarity:"classified",weight:1.0667,min:150,max:350},
+{name:"MP9 | Starlight Protector (Field-Tested)",rarity:"classified",weight:1.0667,min:120,max:280},
+{name:"M4A1-S | Night Terror (Field-Tested)",rarity:"classified",weight:1.0667,min:180,max:400},
+{name:"AK-47 | Nightwish (Field-Tested)",rarity:"covert",weight:0.32,min:500,max:1200},
+{name:"MP7 | Abyssal Apparition (Field-Tested)",rarity:"covert",weight:0.32,min:400,max:900},
+{name:"★ Butterfly Knife | Gamma Doppler (Factory New)",rarity:"special",weight:0.065,min:4500,max:7500},
+{name:"★ Butterfly Knife | Lore (Minimal Wear)",rarity:"special",weight:0.065,min:3500,max:6000},
+{name:"★ Butterfly Knife | Autotronic (Factory New)",rarity:"special",weight:0.065,min:3200,max:5500},
+{name:"★ Butterfly Knife | Black Laminate (Field-Tested)",rarity:"special",weight:0.065,min:2500,max:4200},
+],
+"prisma":[
+{name:"FAMAS | Crypsis (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:18},
+{name:"AK-47 | Uncharted (Field-Tested)",rarity:"milspec",weight:11.4171,min:15,max:40},
+{name:"MAC-10 | Whitefish (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"Galil AR | Akoben (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"MP7 | Mischief (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"P250 | Verdigris (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:18},
+{name:"P90 | Off World (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"AWP | Atheris (Field-Tested)",rarity:"restricted",weight:3.196,min:50,max:150},
+{name:"Desert Eagle | Light Rail (Field-Tested)",rarity:"restricted",weight:3.196,min:40,max:120},
+{name:"R8 Revolver | Skull Crusher (Field-Tested)",rarity:"restricted",weight:3.196,min:35,max:100},
+{name:"XM1014 | Incinegator (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:90},
+{name:"AUG | Momentum (Field-Tested)",rarity:"restricted",weight:3.196,min:35,max:100},
+{name:"MP5-SD | Gauss (Field-Tested)",rarity:"classified",weight:1.0667,min:100,max:250},
+{name:"UMP-45 | Moonrise (Field-Tested)",rarity:"classified",weight:1.0667,min:80,max:200},
+{name:"AK-47 | The Empress (Field-Tested)",rarity:"classified",weight:1.0667,min:200,max:450},
+{name:"M4A4 | The Emperor (Field-Tested)",rarity:"covert",weight:0.32,min:400,max:900},
+{name:"Five-SeveN | Angry Mob (Field-Tested)",rarity:"covert",weight:0.32,min:150,max:350},
+{name:"★ Navaja Knife | Doppler (Factory New)",rarity:"special",weight:0.065,min:1500,max:2800},
+{name:"★ Stiletto Knife | Fade (Factory New)",rarity:"special",weight:0.065,min:2800,max:4800},
+{name:"★ Talon Knife | Doppler (Factory New)",rarity:"special",weight:0.065,min:3200,max:5500},
+{name:"★ Ursus Knife | Slaughter (Factory New)",rarity:"special",weight:0.065,min:1800,max:3200},
+],
+"danger":[
+{name:"MP9 | Modest Threat (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"Glock-18 | Oxide Blaze (Field-Tested)",rarity:"milspec",weight:11.4171,min:8,max:25},
+{name:"Nova | Wood Fired (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"M4A4 | Magnesium (Field-Tested)",rarity:"milspec",weight:11.4171,min:10,max:30},
+{name:"Sawed-Off | Black Sand (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"SG 553 | Danger Close (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"Tec-9 | Fubar (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"USP-S | Flashback (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:90},
+{name:"P250 | Nevermore (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"MAC-10 | Pipe Down (Field-Tested)",rarity:"restricted",weight:3.196,min:20,max:60},
+{name:"Galil AR | Signal (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"G3SG1 | Scavenger (Field-Tested)",rarity:"restricted",weight:3.196,min:20,max:55},
+{name:"UMP-45 | Momentum (Field-Tested)",rarity:"classified",weight:1.0667,min:80,max:200},
+{name:"MP5-SD | Phosphor (Field-Tested)",rarity:"classified",weight:1.0667,min:100,max:250},
+{name:"AK-47 | Asiimov (Field-Tested)",rarity:"classified",weight:1.0667,min:250,max:550},
+{name:"AWP | Neo-Noir (Field-Tested)",rarity:"covert",weight:0.32,min:700,max:1500},
+{name:"Desert Eagle | Mecha Industries (Field-Tested)",rarity:"covert",weight:0.32,min:200,max:450},
+{name:"★ Bayonet | Lore (Minimal Wear)",rarity:"special",weight:0.065,min:2400,max:4200},
+{name:"★ M9 Bayonet | Bright Water (Field-Tested)",rarity:"special",weight:0.065,min:2000,max:3600},
+{name:"★ Karambit | Autotronic (Factory New)",rarity:"special",weight:0.065,min:3500,max:6000},
+{name:"★ Flip Knife | Black Laminate (Field-Tested)",rarity:"special",weight:0.065,min:1500,max:2800},
+],
+"spectrum2":[
+{name:"Sawed-Off | Morris (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"SCAR-20 | Jungle Slipstream (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"MAC-10 | Oceanic (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"Glock-18 | Off World (Field-Tested)",rarity:"milspec",weight:11.4171,min:8,max:25},
+{name:"Tec-9 | Cracked Opal (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"AUG | Triqua (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:18},
+{name:"MP9 | Goo (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"CZ75-Auto | Tacticat (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"UMP-45 | Exposure (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:85},
+{name:"SG 553 | Phantom (Field-Tested)",rarity:"restricted",weight:3.196,min:35,max:100},
+{name:"P250 | See Ya Later (Field-Tested)",rarity:"restricted",weight:3.196,min:40,max:120},
+{name:"M4A1-S | Leaded Glass (Field-Tested)",rarity:"restricted",weight:3.196,min:50,max:140},
+{name:"AK-47 | The Empress (Field-Tested)",rarity:"classified",weight:1.0667,min:200,max:450},
+{name:"PP-Bizon | Judgement of Anubis (Field-Tested)",rarity:"classified",weight:1.0667,min:80,max:200},
+{name:"R8 Revolver | Llama Cannon (Field-Tested)",rarity:"classified",weight:1.0667,min:100,max:250},
+{name:"M4A1-S | Decimator (Field-Tested)",rarity:"covert",weight:0.32,min:150,max:350},
+{name:"USP-S | Neo-Noir (Field-Tested)",rarity:"covert",weight:0.32,min:300,max:700},
+{name:"★ Bowie Knife | Doppler (Factory New)",rarity:"special",weight:0.065,min:2200,max:4000},
+{name:"★ Butterfly Knife | Doppler (Factory New)",rarity:"special",weight:0.065,min:4000,max:7000},
+{name:"★ Huntsman Knife | Fade (Factory New)",rarity:"special",weight:0.065,min:1800,max:3200},
+{name:"★ Falchion Knife | Slaughter (Factory New)",rarity:"special",weight:0.065,min:1500,max:2800},
+],
+"gamma":[
+{name:"Five-SeveN | Violent Daimyo (Field-Tested)",rarity:"milspec",weight:11.4171,min:8,max:25},
+{name:"MAC-10 | Carnivore (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"Nova | Exo (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"P250 | Iron Clad (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"PP-Bizon | Harvester (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"SG 553 | Aerial (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:18},
+{name:"Tec-9 | Ice Cap (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:16},
+{name:"AUG | Aristocrat (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:90},
+{name:"AWP | Phobos (Field-Tested)",rarity:"restricted",weight:3.196,min:40,max:120},
+{name:"P90 | Chopper (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"R8 Revolver | Reboot (Field-Tested)",rarity:"restricted",weight:3.196,min:20,max:60},
+{name:"Sawed-Off | Limelight (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"M4A4 | Desolate Space (Field-Tested)",rarity:"classified",weight:1.0667,min:150,max:350},
+{name:"P2000 | Imperial Dragon (Field-Tested)",rarity:"classified",weight:1.0667,min:80,max:200},
+{name:"SCAR-20 | Bloodsport (Field-Tested)",rarity:"classified",weight:1.0667,min:100,max:250},
+{name:"M4A1-S | Mecha Industries (Field-Tested)",rarity:"covert",weight:0.32,min:250,max:550},
+{name:"Glock-18 | Wasteland Rebel (Field-Tested)",rarity:"covert",weight:0.32,min:120,max:300},
+{name:"★ Bayonet | Gamma Doppler (Factory New)",rarity:"special",weight:0.065,min:3000,max:5200},
+{name:"★ Karambit | Gamma Doppler (Factory New)",rarity:"special",weight:0.065,min:4500,max:8000},
+{name:"★ M9 Bayonet | Lore (Minimal Wear)",rarity:"special",weight:0.065,min:2800,max:4800},
+{name:"★ Flip Knife | Bright Water (Field-Tested)",rarity:"special",weight:0.065,min:1200,max:2200},
+],
+"chroma2":[
+{name:"AK-47 | Elite Build (Field-Tested)",rarity:"milspec",weight:11.4171,min:15,max:40},
+{name:"MP7 | Armor Core (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"Desert Eagle | Bronze Deco (Field-Tested)",rarity:"milspec",weight:11.4171,min:8,max:25},
+{name:"P250 | Valence (Field-Tested)",rarity:"milspec",weight:11.4171,min:10,max:30},
+{name:"Negev | Man-o'-war (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"Sawed-Off | Origami (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"USP-S | Torque (Field-Tested)",rarity:"milspec",weight:11.4171,min:12,max:35},
+{name:"AWP | Worm God (Field-Tested)",rarity:"restricted",weight:3.196,min:40,max:120},
+{name:"MAG-7 | Heat (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"CZ75-Auto | Pole Position (Field-Tested)",rarity:"restricted",weight:3.196,min:20,max:60},
+{name:"UMP-45 | Grand Prix (Field-Tested)",rarity:"restricted",weight:3.196,min:15,max:45},
+{name:"Five-SeveN | Monkey Business (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:90},
+{name:"Galil AR | Eco (Field-Tested)",rarity:"classified",weight:1.0667,min:80,max:200},
+{name:"FAMAS | Djinn (Field-Tested)",rarity:"classified",weight:1.0667,min:100,max:250},
+{name:"M4A1-S | Hyper Beast (Field-Tested)",rarity:"classified",weight:1.0667,min:200,max:450},
+{name:"MAC-10 | Neon Rider (Field-Tested)",rarity:"covert",weight:0.32,min:150,max:350},
+{name:"Galil AR | Chatterbox (Field-Tested)",rarity:"covert",weight:0.32,min:120,max:300},
+{name:"★ Bayonet | Doppler (Factory New)",rarity:"special",weight:0.065,min:2800,max:4800},
+{name:"★ Karambit | Doppler (Factory New)",rarity:"special",weight:0.065,min:4000,max:7000},
+{name:"★ M9 Bayonet | Marble Fade (Factory New)",rarity:"special",weight:0.065,min:3500,max:6000},
+{name:"★ Flip Knife | Tiger Tooth (Factory New)",rarity:"special",weight:0.065,min:1800,max:3200},
+],
+"breakout":[
+{name:"MP7 | Urban Hazard (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"Negev | Desert-Strike (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"P2000 | Ivory (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:18},
+{name:"SSG 08 | Abyss (Field-Tested)",rarity:"milspec",weight:11.4171,min:8,max:25},
+{name:"UMP-45 | Labyrinth (Field-Tested)",rarity:"milspec",weight:11.4171,min:5,max:15},
+{name:"PP-Bizon | Osiris (Field-Tested)",rarity:"milspec",weight:11.4171,min:10,max:30},
+{name:"CZ75-Auto | Tuxedo (Field-Tested)",rarity:"milspec",weight:11.4171,min:8,max:22},
+{name:"P250 | Undertow (Field-Tested)",rarity:"restricted",weight:3.196,min:30,max:90},
+{name:"Five-SeveN | Urban Hazard (Field-Tested)",rarity:"restricted",weight:3.196,min:20,max:60},
+{name:"Desert Eagle | Naga (Field-Tested)",rarity:"restricted",weight:3.196,min:35,max:100},
+{name:"Nova | Koi (Field-Tested)",rarity:"restricted",weight:3.196,min:15,max:45},
+{name:"MAC-10 | Malachite (Field-Tested)",rarity:"restricted",weight:3.196,min:25,max:70},
+{name:"Glock-18 | Water Elemental (Field-Tested)",rarity:"classified",weight:1.0667,min:80,max:200},
+{name:"P250 | Muertos (Field-Tested)",rarity:"classified",weight:1.0667,min:60,max:150},
+{name:"AK-47 | Jaguar (Field-Tested)",rarity:"classified",weight:1.0667,min:200,max:450},
+{name:"M4A1-S | Cyrex (Field-Tested)",rarity:"covert",weight:0.32,min:150,max:350},
+{name:"AWP | Asiimov (Field-Tested)",rarity:"covert",weight:0.32,min:400,max:900},
+{name:"★ Butterfly Knife | Fade (Factory New)",rarity:"special",weight:0.065,min:4000,max:7000},
+{name:"★ Butterfly Knife | Slaughter (Factory New)",rarity:"special",weight:0.065,min:3200,max:5500},
+{name:"★ Butterfly Knife | Case Hardened (Field-Tested)",rarity:"special",weight:0.065,min:2800,max:4800},
+{name:"★ Butterfly Knife | Crimson Web (Field-Tested)",rarity:"special",weight:0.065,min:2500,max:4200},
+],
+"weapon1":[
+{name:"MP7 | Skulls (Field-Tested)",rarity:"milspec",weight:26.64,min:50,max:150},
+{name:"AUG | Wings (Factory New)",rarity:"milspec",weight:26.64,min:80,max:200},
+{name:"SG 553 | Ultraviolet (Field-Tested)",rarity:"milspec",weight:26.64,min:40,max:120},
+{name:"Glock-18 | Dragon Tattoo (Factory New)",rarity:"restricted",weight:5.3267,min:200,max:500},
+{name:"USP-S | Dark Water (Field-Tested)",rarity:"restricted",weight:5.3267,min:150,max:400},
+{name:"M4A1-S | Dark Water (Field-Tested)",rarity:"restricted",weight:5.3267,min:180,max:450},
+{name:"AK-47 | Case Hardened (Field-Tested)",rarity:"classified",weight:1.6,min:800,max:2000},
+{name:"Desert Eagle | Hypnotic (Factory New)",rarity:"classified",weight:1.6,min:600,max:1500},
+{name:"AWP | Lightning Strike (Factory New)",rarity:"covert",weight:0.64,min:2500,max:5000},
+{name:"★ Bayonet | Fade (Factory New)",rarity:"special",weight:0.065,min:3500,max:6000},
+{name:"★ Bayonet | Slaughter (Factory New)",rarity:"special",weight:0.065,min:2800,max:4800},
+{name:"★ Bayonet | Case Hardened (Field-Tested)",rarity:"special",weight:0.065,min:2500,max:4500},
+{name:"★ Bayonet | Doppler (Factory New)",rarity:"special",weight:0.065,min:3200,max:5500},
+],
+"knife":[
+{name:"★ Gut Knife | Safari Mesh (Field-Tested)",rarity:"milspec",weight:19.98,min:800,max:1400},
+{name:"★ Flip Knife | Urban Masked (Field-Tested)",rarity:"milspec",weight:19.98,min:900,max:1600},
+{name:"★ Shadow Daggers | Scorched (Field-Tested)",rarity:"milspec",weight:19.98,min:700,max:1200},
+{name:"★ Navaja Knife | Forest DDPAT (Field-Tested)",rarity:"milspec",weight:19.98,min:600,max:1100},
+{name:"★ Bayonet | Blue Steel (Field-Tested)",rarity:"restricted",weight:3.995,min:1800,max:3200},
+{name:"★ Flip Knife | Night (Field-Tested)",rarity:"restricted",weight:3.995,min:1500,max:2800},
+{name:"★ Gut Knife | Case Hardened (Field-Tested)",rarity:"restricted",weight:3.995,min:1400,max:2600},
+{name:"★ Ursus Knife | Stained (Field-Tested)",rarity:"restricted",weight:3.995,min:1200,max:2200},
+{name:"★ Karambit | Night (Field-Tested)",rarity:"classified",weight:0.8,min:3500,max:5500},
+{name:"★ M9 Bayonet | Ultraviolet (Field-Tested)",rarity:"classified",weight:0.8,min:3200,max:5000},
+{name:"★ Butterfly Knife | Urban Masked (Field-Tested)",rarity:"classified",weight:0.8,min:3000,max:4800},
+{name:"★ Sport Gloves | Bronze Morph (Field-Tested)",rarity:"classified",weight:0.8,min:2500,max:4200},
+{name:"★ Karambit | Doppler (Factory New)",rarity:"covert",weight:0.128,min:4500,max:7500},
+{name:"★ Butterfly Knife | Fade (Factory New)",rarity:"covert",weight:0.128,min:5000,max:8500},
+{name:"★ M9 Bayonet | Lore (Minimal Wear)",rarity:"covert",weight:0.128,min:4000,max:7000},
+{name:"★ Specialist Gloves | Fade (Minimal Wear)",rarity:"covert",weight:0.128,min:3800,max:6500},
+{name:"★ Sport Gloves | Vice (Field-Tested)",rarity:"covert",weight:0.128,min:3500,max:6000},
+{name:"Souvenir AWP | Dragon Lore (Field-Tested)",rarity:"special",weight:0.065,min:550000,max:900000},
+{name:"AWP | Dragon Lore (Factory New)",rarity:"special",weight:0.065,min:900000,max:1500000},
+{name:"★ Karambit | Doppler (Factory New)",rarity:"special",weight:0.065,min:5000,max:8000},
+{name:"★ Butterfly Knife | Gamma Doppler (Factory New)",rarity:"special",weight:0.065,min:5500,max:9000},
+],
+
+"rareonly":[
+{name:"AK-47 | Redline (Field-Tested)",rarity:"classified",weight:12,min:180,max:420},
+{name:"AWP | Asiimov (Field-Tested)",rarity:"classified",weight:12,min:250,max:520},
+{name:"M4A4 | The Emperor (Field-Tested)",rarity:"classified",weight:10,min:400,max:800},
+{name:"M4A1-S | Hyper Beast (Field-Tested)",rarity:"classified",weight:10,min:200,max:450},
+{name:"USP-S | Neo-Noir (Field-Tested)",rarity:"covert",weight:8,min:300,max:700},
+{name:"AK-47 | Fire Serpent (Field-Tested)",rarity:"covert",weight:7,min:900,max:1800},
+{name:"AWP | Neo-Noir (Field-Tested)",rarity:"covert",weight:7,min:700,max:1500},
+{name:"M4A1-S | Printstream (Field-Tested)",rarity:"covert",weight:6,min:300,max:650},
+{name:"Desert Eagle | Printstream (Field-Tested)",rarity:"covert",weight:6,min:250,max:550},
+{name:"★ Karambit | Doppler (Factory New)",rarity:"special",weight:4,min:4500,max:7500},
+{name:"★ Butterfly Knife | Fade (Factory New)",rarity:"special",weight:4,min:5000,max:8500},
+{name:"★ M9 Bayonet | Lore (Minimal Wear)",rarity:"special",weight:3.5,min:4000,max:7000},
+{name:"★ Sport Gloves | Vice (Field-Tested)",rarity:"special",weight:3.5,min:3500,max:6000},
+{name:"AWP | Dragon Lore (Factory New)",rarity:"special",weight:2,min:900000,max:1500000},
+{name:"Souvenir AWP | Dragon Lore (Field-Tested)",rarity:"special",weight:1.5,min:550000,max:900000},
+],
+};
+const allSkins=[
+{name:"Tec-9 | Slab (Field-Tested)",rarity:"milspec",min:8,max:25},
+{name:"UMP-45 | Motorized (Field-Tested)",rarity:"milspec",min:10,max:30},
+{name:"Nova | Dark Sigil (Field-Tested)",rarity:"milspec",min:8,max:22},
+{name:"SSG 08 | Dezastre (Field-Tested)",rarity:"milspec",min:12,max:35},
+{name:"XM1014 | Irezumi (Field-Tested)",rarity:"milspec",min:10,max:28},
+{name:"Dual Berettas | Hideout (Field-Tested)",rarity:"milspec",min:9,max:24},
+{name:"MAC-10 | Light Box (Field-Tested)",rarity:"milspec",min:11,max:32},
+{name:"Glock-18 | Block-18 (Field-Tested)",rarity:"restricted",min:40,max:120},
+{name:"M4A4 | Etch Lord (Field-Tested)",rarity:"restricted",min:50,max:150},
+{name:"Five-SeveN | Hybrid (Field-Tested)",rarity:"restricted",min:35,max:90},
+{name:"MP7 | Just Smile (Field-Tested)",rarity:"restricted",min:30,max:80},
+{name:"Sawed-Off | Analog Input (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"Zeus x27 | Triton (Field-Tested)",rarity:"classified",min:200,max:450},
+{name:"USP-S | Jawbreaker (Field-Tested)",rarity:"classified",min:250,max:500},
+{name:"M4A1-S | Black Lotus (Field-Tested)",rarity:"classified",min:280,max:550},
+{name:"AK-47 | Inheritance (Field-Tested)",rarity:"covert",min:800,max:1800},
+{name:"AWP | Chrome Cannon (Field-Tested)",rarity:"covert",min:900,max:2000},
+{name:"★ Kukri Knife | Fade (Factory New)",rarity:"special",min:2800,max:4500},
+{name:"★ Kukri Knife | Slaughter (Factory New)",rarity:"special",min:2200,max:3800},
+{name:"★ Kukri Knife | Case Hardened (Field-Tested)",rarity:"special",min:1800,max:3200},
+{name:"★ Kukri Knife | Crimson Web (Field-Tested)",rarity:"special",min:1500,max:2800},
+{name:"MAG-7 | Insomnia (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"Tec-9 | Rebel (Field-Tested)",rarity:"milspec",min:5,max:18},
+{name:"SG 553 | Cyberforce (Field-Tested)",rarity:"milspec",min:6,max:20},
+{name:"MP5-SD | Liquidation (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"P250 | Re.built (Field-Tested)",rarity:"milspec",min:7,max:22},
+{name:"SCAR-20 | Fragments (Field-Tested)",rarity:"milspec",min:6,max:18},
+{name:"MP9 | Featherweight (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"M4A1-S | Emphorosaur-S (Field-Tested)",rarity:"restricted",min:40,max:110},
+{name:"Glock-18 | Umbral Rabbit (Field-Tested)",rarity:"restricted",min:35,max:100},
+{name:"P90 | Neoqueen (Field-Tested)",rarity:"restricted",min:30,max:90},
+{name:"MAC-10 | Sakkaku (Field-Tested)",rarity:"restricted",min:25,max:80},
+{name:"R8 Revolver | Banana Cannon (Field-Tested)",rarity:"restricted",min:28,max:85},
+{name:"UMP-45 | Wild Child (Field-Tested)",rarity:"classified",min:180,max:400},
+{name:"AWP | Duality (Field-Tested)",rarity:"classified",min:220,max:480},
+{name:"P2000 | Wicked Sick (Field-Tested)",rarity:"classified",min:160,max:350},
+{name:"AK-47 | Head Shot (Field-Tested)",rarity:"covert",min:700,max:1600},
+{name:"M4A4 | Temukau (Field-Tested)",rarity:"covert",min:900,max:2000},
+{name:"★ Sport Gloves | Amphibious (Field-Tested)",rarity:"special",min:2500,max:4200},
+{name:"★ Specialist Gloves | Lt. Commander (Field-Tested)",rarity:"special",min:1800,max:3200},
+{name:"★ Driver Gloves | Snow Leopard (Field-Tested)",rarity:"special",min:1600,max:2800},
+{name:"★ Hand Wraps | CAUTION! (Field-Tested)",rarity:"special",min:1200,max:2200},
+{name:"FAMAS | Meow 36 (Field-Tested)",rarity:"milspec",min:8,max:25},
+{name:"Galil AR | Destroyer (Field-Tested)",rarity:"milspec",min:7,max:22},
+{name:"Negev | Drop Me (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"P250 | Visions (Field-Tested)",rarity:"milspec",min:10,max:30},
+{name:"UMP-45 | Roadblock (Field-Tested)",rarity:"milspec",min:6,max:18},
+{name:"MAC-10 | Monkeyflage (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"G3SG1 | Dream Glade (Field-Tested)",rarity:"milspec",min:6,max:20},
+{name:"Dual Berettas | Melondrama (Field-Tested)",rarity:"restricted",min:30,max:90},
+{name:"R8 Revolver | Crazy 8 (Field-Tested)",rarity:"restricted",min:35,max:100},
+{name:"SG 553 | Dragon Tech (Field-Tested)",rarity:"restricted",min:40,max:110},
+{name:"P90 | Vent Rush (Field-Tested)",rarity:"restricted",min:28,max:85},
+{name:"M249 | Downtown (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"Sawed-Off | Kiss♥Love (Field-Tested)",rarity:"classified",min:150,max:350},
+{name:"USP-S | Printstream (Field-Tested)",rarity:"classified",min:200,max:450},
+{name:"AK-47 | Ice Coaled (Field-Tested)",rarity:"classified",min:180,max:400},
+{name:"AWP | Chromatic Aberration (Field-Tested)",rarity:"covert",min:600,max:1400},
+{name:"USP-S | The Traitor (Field-Tested)",rarity:"covert",min:500,max:1200},
+{name:"★ Broken Fang Gloves | Jade (Field-Tested)",rarity:"special",min:2000,max:3800},
+{name:"★ Moto Gloves | Finish Line (Field-Tested)",rarity:"special",min:1500,max:2800},
+{name:"★ Specialist Gloves | Field Agent (Field-Tested)",rarity:"special",min:1700,max:3000},
+{name:"★ Driver Gloves | Black Tie (Field-Tested)",rarity:"special",min:1400,max:2500},
+{name:"SG 553 | Heavy Metal (Field-Tested)",rarity:"milspec",min:5,max:18},
+{name:"Glock-18 | Clear Polymer (Field-Tested)",rarity:"milspec",min:8,max:25},
+{name:"M249 | O.S.I.P.R. (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"CZ75-Auto | Circaetus (Field-Tested)",rarity:"milspec",min:6,max:20},
+{name:"R8 Revolver | Junk Yard (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"UMP-45 | Oscillator (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"Nova | Windblown (Field-Tested)",rarity:"milspec",min:4,max:12},
+{name:"MP9 | Food Chain (Field-Tested)",rarity:"restricted",min:40,max:120},
+{name:"Galil AR | Chromatic Aberration (Field-Tested)",rarity:"restricted",min:35,max:100},
+{name:"XM1014 | XOXO (Field-Tested)",rarity:"restricted",min:30,max:90},
+{name:"MAC-10 | Button Up (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"Desert Eagle | Trigger Discipline (Field-Tested)",rarity:"restricted",min:45,max:130},
+{name:"M4A4 | In Living Color (Field-Tested)",rarity:"classified",min:250,max:550},
+{name:"AK-47 | Slate (Field-Tested)",rarity:"classified",min:80,max:180},
+{name:"SSG 08 | Turbo Peek (Field-Tested)",rarity:"covert",min:400,max:900},
+{name:"AK-47 | Legion of Anubis (Field-Tested)",rarity:"covert",min:500,max:1100},
+{name:"★ Broken Fang Gloves | Unhinged (Field-Tested)",rarity:"special",min:1800,max:3400},
+{name:"★ Sport Gloves | Slingshot (Field-Tested)",rarity:"special",min:2200,max:4000},
+{name:"★ Hand Wraps | Giraffe (Field-Tested)",rarity:"special",min:1100,max:2000},
+{name:"★ Driver Gloves | Rezan the Red (Field-Tested)",rarity:"special",min:1300,max:2400},
+{name:"P250 | Cassette (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"P90 | Freight (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"PP-Bizon | Runic (Field-Tested)",rarity:"milspec",min:4,max:12},
+{name:"Tec-9 | Brother (Field-Tested)",rarity:"milspec",min:5,max:18},
+{name:"SG 553 | Ol' Rusty (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"Negev | Prototype (Field-Tested)",rarity:"milspec",min:4,max:12},
+{name:"SSG 08 | Mainframe 001 (Field-Tested)",rarity:"milspec",min:6,max:20},
+{name:"MAG-7 | Monster Call (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"Galil AR | Connexion (Field-Tested)",rarity:"restricted",min:30,max:85},
+{name:"MP5-SD | Kitbash (Field-Tested)",rarity:"restricted",min:28,max:80},
+{name:"MAC-10 | Allure (Field-Tested)",rarity:"restricted",min:35,max:100},
+{name:"XM1014 | Entombed (Field-Tested)",rarity:"restricted",min:40,max:110},
+{name:"Glock-18 | Vogue (Field-Tested)",rarity:"classified",min:80,max:200},
+{name:"M4A4 | Tooth Fairy (Field-Tested)",rarity:"classified",min:120,max:280},
+{name:"Desert Eagle | Printstream (Field-Tested)",rarity:"covert",min:250,max:550},
+{name:"M4A1-S | Printstream (Field-Tested)",rarity:"covert",min:300,max:650},
+{name:"★ Survival Knife | Fade (Factory New)",rarity:"special",min:2000,max:3500},
+{name:"★ Paracord Knife | Slaughter (Factory New)",rarity:"special",min:1800,max:3200},
+{name:"★ Nomad Knife | Case Hardened (Field-Tested)",rarity:"special",min:1600,max:3000},
+{name:"★ Skeleton Knife | Crimson Web (Field-Tested)",rarity:"special",min:2500,max:4500},
+{name:"PP-Bizon | Night Riot (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"Five-SeveN | Flame Test (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"MP9 | Black Sand (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"P2000 | Urban Hazard (Field-Tested)",rarity:"milspec",min:5,max:18},
+{name:"R8 Revolver | Grip (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"SG 553 | Aloha (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"XM1014 | Oxide Blaze (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"Glock-18 | Moonrise (Field-Tested)",rarity:"restricted",min:30,max:90},
+{name:"Negev | Lionfish (Field-Tested)",rarity:"restricted",min:20,max:60},
+{name:"Nova | Wild Six (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"MAG-7 | SWAG-7 (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"UMP-45 | Arctic Wolf (Field-Tested)",rarity:"restricted",min:30,max:85},
+{name:"AUG | Stymphalian (Field-Tested)",rarity:"classified",min:100,max:250},
+{name:"USP-S | Cortex (Field-Tested)",rarity:"classified",min:80,max:200},
+{name:"AWP | Mortis (Field-Tested)",rarity:"classified",min:150,max:350},
+{name:"MP7 | Bloodsport (Field-Tested)",rarity:"covert",min:200,max:500},
+{name:"M4A4 | Neo-Noir (Field-Tested)",rarity:"covert",min:350,max:800},
+{name:"★ Hand Wraps | Cobalt Skulls (Field-Tested)",rarity:"special",min:1400,max:2600},
+{name:"★ Specialist Gloves | Fade (Minimal Wear)",rarity:"special",min:3000,max:5200},
+{name:"★ Sport Gloves | Vice (Field-Tested)",rarity:"special",min:2800,max:4800},
+{name:"★ Driver Gloves | King Snake (Field-Tested)",rarity:"special",min:1800,max:3200},
+{name:"MAG-7 | Foresight (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"SCAR-20 | Enforcer (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"Sawed-Off | Spirit Board (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"P2000 | Lifted Spirits (Field-Tested)",rarity:"milspec",min:6,max:20},
+{name:"MP5-SD | Necro Jr. (Field-Tested)",rarity:"milspec",min:5,max:18},
+{name:"MAC-10 | Ensnared (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"Five-SeveN | Scrawl (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"XM1014 | Zombie Offensive (Field-Tested)",rarity:"restricted",min:30,max:90},
+{name:"PP-Bizon | Space Cat (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"USP-S | Ticket to Hell (Field-Tested)",rarity:"restricted",min:40,max:110},
+{name:"FAMAS | Rapid Eye Movement (Field-Tested)",rarity:"classified",min:150,max:350},
+{name:"MP9 | Starlight Protector (Field-Tested)",rarity:"classified",min:120,max:280},
+{name:"M4A1-S | Night Terror (Field-Tested)",rarity:"classified",min:180,max:400},
+{name:"AK-47 | Nightwish (Field-Tested)",rarity:"covert",min:500,max:1200},
+{name:"MP7 | Abyssal Apparition (Field-Tested)",rarity:"covert",min:400,max:900},
+{name:"★ Butterfly Knife | Gamma Doppler (Factory New)",rarity:"special",min:4500,max:7500},
+{name:"★ Butterfly Knife | Lore (Minimal Wear)",rarity:"special",min:3500,max:6000},
+{name:"★ Butterfly Knife | Autotronic (Factory New)",rarity:"special",min:3200,max:5500},
+{name:"★ Butterfly Knife | Black Laminate (Field-Tested)",rarity:"special",min:2500,max:4200},
+{name:"FAMAS | Crypsis (Field-Tested)",rarity:"milspec",min:5,max:18},
+{name:"AK-47 | Uncharted (Field-Tested)",rarity:"milspec",min:15,max:40},
+{name:"MAC-10 | Whitefish (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"Galil AR | Akoben (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"MP7 | Mischief (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"P250 | Verdigris (Field-Tested)",rarity:"milspec",min:5,max:18},
+{name:"P90 | Off World (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"AWP | Atheris (Field-Tested)",rarity:"restricted",min:50,max:150},
+{name:"Desert Eagle | Light Rail (Field-Tested)",rarity:"restricted",min:40,max:120},
+{name:"R8 Revolver | Skull Crusher (Field-Tested)",rarity:"restricted",min:35,max:100},
+{name:"XM1014 | Incinegator (Field-Tested)",rarity:"restricted",min:30,max:90},
+{name:"AUG | Momentum (Field-Tested)",rarity:"restricted",min:35,max:100},
+{name:"MP5-SD | Gauss (Field-Tested)",rarity:"classified",min:100,max:250},
+{name:"UMP-45 | Moonrise (Field-Tested)",rarity:"classified",min:80,max:200},
+{name:"AK-47 | The Empress (Field-Tested)",rarity:"classified",min:200,max:450},
+{name:"M4A4 | The Emperor (Field-Tested)",rarity:"covert",min:400,max:900},
+{name:"Five-SeveN | Angry Mob (Field-Tested)",rarity:"covert",min:150,max:350},
+{name:"★ Navaja Knife | Doppler (Factory New)",rarity:"special",min:1500,max:2800},
+{name:"★ Stiletto Knife | Fade (Factory New)",rarity:"special",min:2800,max:4800},
+{name:"★ Talon Knife | Doppler (Factory New)",rarity:"special",min:3200,max:5500},
+{name:"★ Ursus Knife | Slaughter (Factory New)",rarity:"special",min:1800,max:3200},
+{name:"MP9 | Modest Threat (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"Glock-18 | Oxide Blaze (Field-Tested)",rarity:"milspec",min:8,max:25},
+{name:"Nova | Wood Fired (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"M4A4 | Magnesium (Field-Tested)",rarity:"milspec",min:10,max:30},
+{name:"Sawed-Off | Black Sand (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"SG 553 | Danger Close (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"Tec-9 | Fubar (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"USP-S | Flashback (Field-Tested)",rarity:"restricted",min:30,max:90},
+{name:"P250 | Nevermore (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"MAC-10 | Pipe Down (Field-Tested)",rarity:"restricted",min:20,max:60},
+{name:"Galil AR | Signal (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"G3SG1 | Scavenger (Field-Tested)",rarity:"restricted",min:20,max:55},
+{name:"UMP-45 | Momentum (Field-Tested)",rarity:"classified",min:80,max:200},
+{name:"MP5-SD | Phosphor (Field-Tested)",rarity:"classified",min:100,max:250},
+{name:"AK-47 | Asiimov (Field-Tested)",rarity:"classified",min:250,max:550},
+{name:"AWP | Neo-Noir (Field-Tested)",rarity:"covert",min:700,max:1500},
+{name:"Desert Eagle | Mecha Industries (Field-Tested)",rarity:"covert",min:200,max:450},
+{name:"★ Bayonet | Lore (Minimal Wear)",rarity:"special",min:2400,max:4200},
+{name:"★ M9 Bayonet | Bright Water (Field-Tested)",rarity:"special",min:2000,max:3600},
+{name:"★ Karambit | Autotronic (Factory New)",rarity:"special",min:3500,max:6000},
+{name:"★ Flip Knife | Black Laminate (Field-Tested)",rarity:"special",min:1500,max:2800},
+{name:"Sawed-Off | Morris (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"SCAR-20 | Jungle Slipstream (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"MAC-10 | Oceanic (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"Glock-18 | Off World (Field-Tested)",rarity:"milspec",min:8,max:25},
+{name:"Tec-9 | Cracked Opal (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"AUG | Triqua (Field-Tested)",rarity:"milspec",min:5,max:18},
+{name:"MP9 | Goo (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"CZ75-Auto | Tacticat (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"UMP-45 | Exposure (Field-Tested)",rarity:"restricted",min:30,max:85},
+{name:"SG 553 | Phantom (Field-Tested)",rarity:"restricted",min:35,max:100},
+{name:"P250 | See Ya Later (Field-Tested)",rarity:"restricted",min:40,max:120},
+{name:"M4A1-S | Leaded Glass (Field-Tested)",rarity:"restricted",min:50,max:140},
+{name:"PP-Bizon | Judgement of Anubis (Field-Tested)",rarity:"classified",min:80,max:200},
+{name:"R8 Revolver | Llama Cannon (Field-Tested)",rarity:"classified",min:100,max:250},
+{name:"M4A1-S | Decimator (Field-Tested)",rarity:"covert",min:150,max:350},
+{name:"USP-S | Neo-Noir (Field-Tested)",rarity:"covert",min:300,max:700},
+{name:"★ Bowie Knife | Doppler (Factory New)",rarity:"special",min:2200,max:4000},
+{name:"★ Butterfly Knife | Doppler (Factory New)",rarity:"special",min:4000,max:7000},
+{name:"★ Huntsman Knife | Fade (Factory New)",rarity:"special",min:1800,max:3200},
+{name:"★ Falchion Knife | Slaughter (Factory New)",rarity:"special",min:1500,max:2800},
+{name:"Five-SeveN | Violent Daimyo (Field-Tested)",rarity:"milspec",min:8,max:25},
+{name:"MAC-10 | Carnivore (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"Nova | Exo (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"P250 | Iron Clad (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"PP-Bizon | Harvester (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"SG 553 | Aerial (Field-Tested)",rarity:"milspec",min:5,max:18},
+{name:"Tec-9 | Ice Cap (Field-Tested)",rarity:"milspec",min:5,max:16},
+{name:"AUG | Aristocrat (Field-Tested)",rarity:"restricted",min:30,max:90},
+{name:"AWP | Phobos (Field-Tested)",rarity:"restricted",min:40,max:120},
+{name:"P90 | Chopper (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"R8 Revolver | Reboot (Field-Tested)",rarity:"restricted",min:20,max:60},
+{name:"Sawed-Off | Limelight (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"M4A4 | Desolate Space (Field-Tested)",rarity:"classified",min:150,max:350},
+{name:"P2000 | Imperial Dragon (Field-Tested)",rarity:"classified",min:80,max:200},
+{name:"SCAR-20 | Bloodsport (Field-Tested)",rarity:"classified",min:100,max:250},
+{name:"M4A1-S | Mecha Industries (Field-Tested)",rarity:"covert",min:250,max:550},
+{name:"Glock-18 | Wasteland Rebel (Field-Tested)",rarity:"covert",min:120,max:300},
+{name:"★ Bayonet | Gamma Doppler (Factory New)",rarity:"special",min:3000,max:5200},
+{name:"★ Karambit | Gamma Doppler (Factory New)",rarity:"special",min:4500,max:8000},
+{name:"★ M9 Bayonet | Lore (Minimal Wear)",rarity:"special",min:2800,max:4800},
+{name:"★ Flip Knife | Bright Water (Field-Tested)",rarity:"special",min:1200,max:2200},
+{name:"AK-47 | Elite Build (Field-Tested)",rarity:"milspec",min:15,max:40},
+{name:"MP7 | Armor Core (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"Desert Eagle | Bronze Deco (Field-Tested)",rarity:"milspec",min:8,max:25},
+{name:"P250 | Valence (Field-Tested)",rarity:"milspec",min:10,max:30},
+{name:"Negev | Man-o'-war (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"Sawed-Off | Origami (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"USP-S | Torque (Field-Tested)",rarity:"milspec",min:12,max:35},
+{name:"AWP | Worm God (Field-Tested)",rarity:"restricted",min:40,max:120},
+{name:"MAG-7 | Heat (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"CZ75-Auto | Pole Position (Field-Tested)",rarity:"restricted",min:20,max:60},
+{name:"UMP-45 | Grand Prix (Field-Tested)",rarity:"restricted",min:15,max:45},
+{name:"Five-SeveN | Monkey Business (Field-Tested)",rarity:"restricted",min:30,max:90},
+{name:"Galil AR | Eco (Field-Tested)",rarity:"classified",min:80,max:200},
+{name:"FAMAS | Djinn (Field-Tested)",rarity:"classified",min:100,max:250},
+{name:"M4A1-S | Hyper Beast (Field-Tested)",rarity:"classified",min:200,max:450},
+{name:"MAC-10 | Neon Rider (Field-Tested)",rarity:"covert",min:150,max:350},
+{name:"Galil AR | Chatterbox (Field-Tested)",rarity:"covert",min:120,max:300},
+{name:"★ Bayonet | Doppler (Factory New)",rarity:"special",min:2800,max:4800},
+{name:"★ Karambit | Doppler (Factory New)",rarity:"special",min:4000,max:7000},
+{name:"★ M9 Bayonet | Marble Fade (Factory New)",rarity:"special",min:3500,max:6000},
+{name:"★ Flip Knife | Tiger Tooth (Factory New)",rarity:"special",min:1800,max:3200},
+{name:"MP7 | Urban Hazard (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"Negev | Desert-Strike (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"P2000 | Ivory (Field-Tested)",rarity:"milspec",min:5,max:18},
+{name:"SSG 08 | Abyss (Field-Tested)",rarity:"milspec",min:8,max:25},
+{name:"UMP-45 | Labyrinth (Field-Tested)",rarity:"milspec",min:5,max:15},
+{name:"PP-Bizon | Osiris (Field-Tested)",rarity:"milspec",min:10,max:30},
+{name:"CZ75-Auto | Tuxedo (Field-Tested)",rarity:"milspec",min:8,max:22},
+{name:"P250 | Undertow (Field-Tested)",rarity:"restricted",min:30,max:90},
+{name:"Five-SeveN | Urban Hazard (Field-Tested)",rarity:"restricted",min:20,max:60},
+{name:"Desert Eagle | Naga (Field-Tested)",rarity:"restricted",min:35,max:100},
+{name:"Nova | Koi (Field-Tested)",rarity:"restricted",min:15,max:45},
+{name:"MAC-10 | Malachite (Field-Tested)",rarity:"restricted",min:25,max:70},
+{name:"Glock-18 | Water Elemental (Field-Tested)",rarity:"classified",min:80,max:200},
+{name:"P250 | Muertos (Field-Tested)",rarity:"classified",min:60,max:150},
+{name:"AK-47 | Jaguar (Field-Tested)",rarity:"classified",min:200,max:450},
+{name:"M4A1-S | Cyrex (Field-Tested)",rarity:"covert",min:150,max:350},
+{name:"AWP | Asiimov (Field-Tested)",rarity:"covert",min:400,max:900},
+{name:"★ Butterfly Knife | Fade (Factory New)",rarity:"special",min:4000,max:7000},
+{name:"★ Butterfly Knife | Slaughter (Factory New)",rarity:"special",min:3200,max:5500},
+{name:"★ Butterfly Knife | Case Hardened (Field-Tested)",rarity:"special",min:2800,max:4800},
+{name:"★ Butterfly Knife | Crimson Web (Field-Tested)",rarity:"special",min:2500,max:4200},
+{name:"MP7 | Skulls (Field-Tested)",rarity:"milspec",min:50,max:150},
+{name:"AUG | Wings (Factory New)",rarity:"milspec",min:80,max:200},
+{name:"SG 553 | Ultraviolet (Field-Tested)",rarity:"milspec",min:40,max:120},
+{name:"Glock-18 | Dragon Tattoo (Factory New)",rarity:"restricted",min:200,max:500},
+{name:"USP-S | Dark Water (Field-Tested)",rarity:"restricted",min:150,max:400},
+{name:"M4A1-S | Dark Water (Field-Tested)",rarity:"restricted",min:180,max:450},
+{name:"AK-47 | Case Hardened (Field-Tested)",rarity:"classified",min:800,max:2000},
+{name:"Desert Eagle | Hypnotic (Factory New)",rarity:"classified",min:600,max:1500},
+{name:"AWP | Lightning Strike (Factory New)",rarity:"covert",min:2500,max:5000},
+{name:"★ Bayonet | Fade (Factory New)",rarity:"special",min:3500,max:6000},
+{name:"★ Bayonet | Slaughter (Factory New)",rarity:"special",min:2800,max:4800},
+{name:"★ Bayonet | Case Hardened (Field-Tested)",rarity:"special",min:2500,max:4500},
+{name:"★ Gut Knife | Safari Mesh (Field-Tested)",rarity:"milspec",min:800,max:1400},
+{name:"★ Flip Knife | Urban Masked (Field-Tested)",rarity:"milspec",min:900,max:1600},
+{name:"★ Shadow Daggers | Scorched (Field-Tested)",rarity:"milspec",min:700,max:1200},
+{name:"★ Navaja Knife | Forest DDPAT (Field-Tested)",rarity:"milspec",min:600,max:1100},
+{name:"★ Bayonet | Blue Steel (Field-Tested)",rarity:"restricted",min:1800,max:3200},
+{name:"★ Flip Knife | Night (Field-Tested)",rarity:"restricted",min:1500,max:2800},
+{name:"★ Gut Knife | Case Hardened (Field-Tested)",rarity:"restricted",min:1400,max:2600},
+{name:"★ Ursus Knife | Stained (Field-Tested)",rarity:"restricted",min:1200,max:2200},
+{name:"★ Karambit | Night (Field-Tested)",rarity:"classified",min:3500,max:5500},
+{name:"★ M9 Bayonet | Ultraviolet (Field-Tested)",rarity:"classified",min:3200,max:5000},
+{name:"★ Butterfly Knife | Urban Masked (Field-Tested)",rarity:"classified",min:3000,max:4800},
+{name:"★ Sport Gloves | Bronze Morph (Field-Tested)",rarity:"classified",min:2500,max:4200},
+{name:"Souvenir AWP | Dragon Lore (Field-Tested)",rarity:"special",min:550000,max:900000},
+{name:"AWP | Dragon Lore (Factory New)",rarity:"special",min:900000,max:1500000},
 ];
 
-const regularDrops=[
-  {name:"AK-47 | Slate (Field-Tested)",rarity:"consumer",weight:20,min:8,max:20},
-  {name:"USP-S | Cortex (Field-Tested)",rarity:"consumer",weight:20,min:10,max:25},
-  {name:"Glock-18 | Vogue (Field-Tested)",rarity:"industrial",weight:16,min:15,max:40},
-  {name:"Desert Eagle | Printstream (Field-Tested)",rarity:"restricted",weight:9,min:150,max:320},
-  {name:"M4A1-S | Printstream (Field-Tested)",rarity:"restricted",weight:10,min:120,max:260},
-  {name:"AK-47 | Redline (Field-Tested)",rarity:"classified",weight:6,min:180,max:420},
-  {name:"AWP | Asiimov (Field-Tested)",rarity:"classified",weight:6,min:250,max:520},
-  {name:"M4A4 | The Emperor (Field-Tested)",rarity:"classified",weight:5,min:400,max:800},
-  {name:"AWP | Neo-Noir (Field-Tested)",rarity:"covert",weight:3,min:700,max:1500},
-  {name:"AK-47 | Fire Serpent (Field-Tested)",rarity:"covert",weight:3,min:900,max:1800}
-];
-const specialDrops=[
-  {name:"★ Karambit | Doppler (Factory New)",rarity:"special",weight:.35,min:3200,max:5400},
-  {name:"★ Butterfly Knife | Fade (Factory New)",rarity:"special",weight:.3,min:3600,max:6000},
-  {name:"★ M9 Bayonet | Lore (Minimal Wear)",rarity:"special",weight:.35,min:2400,max:4200},
-  {name:"★ Bayonet | Autotronic (Factory New)",rarity:"special",weight:.3,min:2600,max:4600},
-  {name:"★ Sport Gloves | Vice (Field-Tested)",rarity:"special",weight:.3,min:2800,max:4800},
-  {name:"★ Specialist Gloves | Fade (Minimal Wear)",rarity:"special",weight:.25,min:3000,max:5200},
-  {name:"★ Driver Gloves | King Snake (Field-Tested)",rarity:"special",weight:.35,min:1800,max:3200},
-  {name:"★ Hand Wraps | Cobalt Skulls (Field-Tested)",rarity:"special",weight:.4,min:1400,max:2600}
-];
-const dropPool=[...regularDrops,...specialDrops];
-const dropWeightTotal=dropPool.reduce((s,x)=>s+x.weight,0);
+const caseImages={
+"rareonly":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnIV7Kb5OaU-JqfHDzXFle0u4LY8Gy_kkRgisGzcm4v4J3vDOAQmDMdyRvlK7EcmeCU3yw",
+"kilowatt":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnEVvqf_a6VoIfGSXz7Hlbwg57QwSS_mxhl15jiGyN37c3_GZw91W8BwRflK7EfKsa2sfw",
+"revolution":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnAVvfb6aqduc_TFVjTCxbx05OU4S3jilE9w4DzRnImtIy2Sa1JzDJEhRPlK7EcO4U8gfA",
+"recoil":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnMVu6b-avA-JqSSCjSWwuhz47U9TCzlxh9yt2WGnNqgIi-fbgUkWMNxFPlK7EdIJF6a2Q",
+"snakebite":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fr3oVvvT4bfI4dvTLCGTCmLl16ec7TX_mk08k42iHwtqscy-WPVUmCZJ4R_lK7Ed8Q6OYtw",
+"fracture":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fr3QV7aD7OP01IfbGDzPCmbsm4LU5GnvkzUsi4WvUmIqtci_CPQNyApsjE_lK7EfrhW545A",
+"clutch":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frHsVtqr8a_dsdKTAWDWVxLgjsrAwHSvgwEQk4m-ByYuqIC2eO1VyD5QiR_lK7EcxQQPYQA",
+"dreams":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnIV7Kb5OaU-JqfHDzXFle0u4LY8Gy_kkRgisGzcm4v4J3vDOAQmDMdyRvlK7EcmeCU3yw",
+"prisma":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fr3AV6aD8O6BpdKKQVmPEwr1zs-c8Tnngl09w52zTmY2sc3jBb8jXpohE_lK7Ede7E2Kfw",
+"danger":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fr3MVv_H4a6FucPPBWjDIkbdz4rg4Syyyxxsi5mzRntuvJCqVbwAgDZBwRPlK7EcZJ5GkQA",
+"spectrum2":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frHoVu6D7PaA0JaDACjKUwOom47VrTSzrw0Vx4W_Sydz9JC7FZgckCZYjRPlK7EcPuDAQzw",
+"gamma":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frHEVtvP5bPZrd6XECmOSxe0v4bRoTnnjwBkitWrRm4yoeX3GagMnCZZ2FPlK7EcEv22BnQ",
+"chroma2":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fqmwOuKD2PqI6caDBWDeUkO8uteM9SnDglklw6miEn9j6IHKfblNxA5pxW6dU5UH4LtBe",
+"breakout":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fqWxdv_b8O_w5eKXBWWXHw-smtrBvTHDmwEsl4jvWn4z_I3qWZwV1X5ZwW6dU5RcRF1o0",
+"weapon1":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bji61XxRCKg0MSz_nUDvPb-OPFvdKTFDzbAkbp16bY5Gn6wkx9ysj7Xntf9IC6WZgA-Sswnnj45WXo",
+"knife":"https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frHcVuPaoafU1JqiVWWSVkux15OQ8Giiylk0k5mvTnIqpd3PCaQIhWMYkE_lK7EcNeCKW-w",
+};
 const rarityColor={consumer:"#b0c3d9",industrial:"#5e98d9",milspec:"#4b69ff",restricted:"#8847ff",classified:"#d32ce6",covert:"#eb4b4b",special:"#ffd700"};
-function weightedPick(){
-  let r=Math.random()*dropWeightTotal;
-  for(const it of dropPool){ if((r-=it.weight)<=0) return it; }
-  return dropPool[dropPool.length-1];
+function getPool(caseEntry){
+  const key=caseEntry[4];
+  return casePools[key]||casePools.kilowatt;
 }
-function priceFor(entry){ return Math.round((entry.min+Math.random()*(entry.max-entry.min))/5)*5; }
+function weightedPickFrom(pool){
+  const total=pool.reduce((s,x)=>s+x.weight,0);
+  let r=Math.random()*total;
+  for(const it of pool){ if((r-=it.weight)<=0) return it; }
+  return pool[pool.length-1];
+}
+function priceFor(entry){
+  // approximate Steam-like price in DM (static snapshot-style range)
+  return Math.round((entry.min+Math.random()*(entry.max-entry.min))/5)*5;
+}
 
-let balance=10000,current=null,invId=1;
+let balance=50000,current=null,invId=1;
 let inventory=[];
 const fmt=n=>n.toLocaleString("ru-RU");
 function updateBalance(){document.getElementById("balance").textContent=fmt(balance)}
@@ -397,19 +1223,22 @@ function render(list=cases){
     const d=document.createElement("article");
     d.className="card";
     d.dataset.cat=c[3];
-    d.innerHTML=`<div class="caseArt">${imgTag(c[1])}<span class="caseBadge">CS2</span></div><div class="name">${c[0]} <span class="price">${fmt(c[2])} DM</span></div><div class="meta">Скины CS2 · виртуальные</div><button type="button" class="open">Открыть</button>`;
+    d.innerHTML=`<div class="caseArt"><img src="${caseImages[c[4]]||itemImg(c[1])}" alt="${c[0]}" loading="lazy" onerror="this.style.opacity=.4"><span class="caseBadge">CS2</span></div><div class="name">${c[0]} <span class="price">${fmt(c[2])} DM</span></div><div class="meta">Скины CS2 · виртуальные</div><button type="button" class="open">Открыть</button>`;
     d.querySelector("button").onclick=()=>openCase(c);
     grid.appendChild(d);
   });
   empty.style.display=list.length?"none":"block";
 }
 
-function renderDropList(){
-  const sorted=[...dropPool].sort((a,b)=>a.min-b.min);
+function renderDropList(pool){
+  if(!pool) pool=casePools.kilowatt;
+  const total=pool.reduce((s,x)=>s+x.weight,0);
+  const sorted=[...pool].sort((a,b)=>a.min-b.min);
   dropList.innerHTML=sorted.map(it=>{
-    const chance=it.weight/dropWeightTotal*100;
+    const chance=it.weight/total*100;
     const chanceStr=chance<1?chance.toFixed(2)+"%":chance.toFixed(1)+"%";
-    return `<div class="dropItem" style="border-left-color:${rarityColor[it.rarity]}">${imgTag(it.name)}<span class="dropName">${shortName(it.name)}</span><span class="dropPrice">${fmt(it.min)}–${fmt(it.max)} DM</span><span class="dropChance" style="color:${rarityColor[it.rarity]}">${chanceStr}</span></div>`;
+    const col=rarityColor[it.rarity]||"#b0c3d9";
+    return `<div class="dropItem" style="border-left-color:${col}">${imgTag(it.name)}<span class="dropName">${shortName(it.name)}</span><span class="dropPrice">${fmt(it.min)}–${fmt(it.max)} DM</span><span class="dropChance" style="color:${col}">${chanceStr}</span></div>`;
   }).join("");
 }
 dropToggleBtn.onclick=()=>{
@@ -422,13 +1251,16 @@ const ITEM_W=120;
 const REEL_COUNT=28;
 const WIN_INDEX=22; // which slot lands under the center marker
 
+let currentPool=casePools.kilowatt;
 function buildReel(winEntry){
   track.style.transition="none";
   track.style.transform="translateX(0)";
   track.innerHTML="";
+  const pool=currentPool||casePools.kilowatt;
   for(let i=0;i<REEL_COUNT;i++){
-    const p=(i===WIN_INDEX && winEntry)?winEntry:weightedPick();
-    track.innerHTML+=`<div class="item">${imgTag(p.name)}<span>${shortName(p.name)}</span></div>`;
+    const p=(i===WIN_INDEX && winEntry)?winEntry:weightedPickFrom(pool);
+    const rc=rarityColor[p.rarity]||"#b0c3d9";
+    track.innerHTML+=`<div class="item" style="border-color:${rc};box-shadow:inset 0 0 0 1px ${rc}55"><span class="rarityDot" style="background:${rc}"></span>${imgTag(p.name)}<span style="color:${rc}">${shortName(p.name)}</span></div>`;
   }
   void track.offsetWidth;
   track.style.transition="";
@@ -436,13 +1268,15 @@ function buildReel(winEntry){
 function openCase(c){
   if(balance<c[2]){alert("Недостаточно демо-монет.");return}
   current=c;
+  currentPool=getPool(c);
   modalTitle.textContent=`${c[0]} — открытие`;
   spin.textContent=`Открыть за ${fmt(c[2])} DM`;
   spin.disabled=false;
   result.textContent="Нажми «Открыть», чтобы запустить рулетку";
   dropList.classList.remove("on");
   dropToggleBtn.textContent="Показать возможные предметы";
-  buildReel(null); // preview strip only
+  renderDropList(currentPool);
+  buildReel(null);
   modal.classList.add("on");
   document.body.style.overflow="hidden";
 }
@@ -457,11 +1291,18 @@ spin.onclick=()=>{
   result.textContent="Крутим…";
 
   // 1) decide the real winner first
-  const winEntry=weightedPick();
+  const winEntry=weightedPickFrom(currentPool);
   // 2) put that winner exactly under the marker stop position
   buildReel(winEntry);
 
   // 3) measure where the winning item's center should land
+  ensureAudio();
+  let tickN=0;
+  const tickIv=setInterval(()=>{
+    playTick(Math.min(1, tickN/42));
+    tickN++;
+    if(tickN>42) clearInterval(tickIv);
+  }, 52);
   requestAnimationFrame(()=>{requestAnimationFrame(()=>{
     const roulette=track.parentElement;
     const markerX=roulette.clientWidth/2;
@@ -477,7 +1318,7 @@ spin.onclick=()=>{
     inventory.push(item);
     renderInventory();
     const star=winEntry.rarity==="special"?" ★":"";
-    result.innerHTML=`Ты получил <b>${shortName(winEntry.name)}</b>${star} · ${fmt(price)} DM — предмет добавлен в инвентарь 🎉`;
+    playWin(); result.innerHTML=`Ты получил <b>${shortName(winEntry.name)}</b>${star} · ${fmt(price)} DM — предмет добавлен в инвентарь 🎉`;
     spin.disabled=false;
     spin.textContent=`Открыть ещё за ${fmt(current[2])} DM`;
   },2500);
@@ -574,65 +1415,161 @@ function sellItem(id){
 }
 
 /* ---------- upgrade ---------- */
-const upgradeSelect=document.getElementById("upgradeSelect");
 const btnUpgrade=document.getElementById("btnUpgrade");
 const upgradeChance=document.getElementById("upgradeChance");
 const upgradeTarget=document.getElementById("upgradeTarget");
 const upgradeResult=document.getElementById("upgradeResult");
-let upgradePickId=null,upgradeMult=2;
+const upPickGrid=document.getElementById("upPickGrid");
+const upSelected=document.getElementById("upSelected");
+const upSumVal=document.getElementById("upSumVal");
+const upTargetBox=document.getElementById("upTargetBox");
+const upChanceHint=document.getElementById("upChanceHint");
+const upgradeCashRange=document.getElementById("upgradeCashRange");
+const upgradeCashLabel=document.getElementById("upgradeCashLabel");
+const upgradeCashBonus=document.getElementById("upgradeCashBonus");
+const upRingBg=document.getElementById("upRingBg");
+const upArrow=document.querySelector(".upArrow");
+let upgradeMult=2;
+let upgradeSel=new Set();
+
+function baseChance(mult){return Math.max(6,Math.min(88,Math.round(78/mult)))}
+function cashBonus(){
+  const v=Math.max(0, Number(upgradeCashRange&&upgradeCashRange.value)||0);
+  return Math.min(30, Math.floor(v/50));
+}
+function itemBonus(){ return Math.min(20, Math.max(0,(upgradeSel.size-1)*3)); }
+function totalChance(){
+  if(!upgradeSel.size) return 0;
+  return Math.min(92, baseChance(upgradeMult)+cashBonus()+itemBonus());
+}
+function cashCost(){ return Math.max(0, Number(upgradeCashRange&&upgradeCashRange.value)||0); }
+function selectedItems(){ return inventory.filter(x=>upgradeSel.has(x.id)); }
+function selectedSum(){ return selectedItems().reduce((s,x)=>s+x.price,0); }
 
 function renderUpgradeOptions(){
-  const keep=upgradePickId;
-  upgradeSelect.innerHTML='<option value="">— выбери предмет —</option>'+inventory.map(it=>`<option value="${it.id}">${shortName(it.name)} · ${fmt(it.price)} DM</option>`).join("");
-  if(inventory.some(x=>x.id===keep)){upgradeSelect.value=keep;upgradePickId=keep}else{upgradePickId=null}
+  // keep only existing ids
+  upgradeSel=new Set([...upgradeSel].filter(id=>inventory.some(x=>x.id===id)));
+  if(upPickGrid){
+    upPickGrid.innerHTML="";
+    inventory.forEach(it=>{
+      const picked=upgradeSel.has(it.id);
+      const d=document.createElement("div");
+      d.className="upPickItem"+(picked?" picked":"");
+      d.innerHTML=`${imgTag(it.name)}<small>${fmt(it.price)}</small>`;
+      d.onclick=()=>{
+        if(upgradeSel.has(it.id)) upgradeSel.delete(it.id);
+        else if(upgradeSel.size<8) upgradeSel.add(it.id);
+        renderUpgradeOptions();
+      };
+      upPickGrid.appendChild(d);
+    });
+  }
+  if(upSelected){
+    upSelected.innerHTML=selectedItems().map(it=>`<div class="upPickItem picked">${imgTag(it.name)}<small>${fmt(it.price)}</small></div>`).join("")||"";
+  }
+  if(upSumVal) upSumVal.textContent=fmt(selectedSum());
   updateUpgradePreview();
 }
-upgradeSelect.onchange=()=>{upgradePickId=upgradeSelect.value?Number(upgradeSelect.value):null;updateUpgradePreview();};
+
 document.querySelectorAll(".multBtn").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".multBtn").forEach(x=>x.classList.remove("active"));
   b.classList.add("active");
   upgradeMult=Number(b.dataset.mult);
   updateUpgradePreview();
 });
-function chanceFor(mult){return Math.max(6,Math.min(88,Math.round(78/mult)))}
-function updateUpgradePreview(){
-  const it=inventory.find(x=>x.id===upgradePickId);
-  if(!it){upgradeChance.textContent="—";upgradeTarget.textContent="—";btnUpgrade.disabled=true;return}
-  const chance=chanceFor(upgradeMult);
-  upgradeChance.textContent=chance+"%";
-  upgradeTarget.textContent=fmt(Math.round(it.price*upgradeMult))+" DM";
-  btnUpgrade.disabled=false;
+if(upgradeCashRange){
+  upgradeCashRange.oninput=()=>{
+    upgradeCashLabel.textContent=fmt(cashCost())+" DM";
+    upgradeCashBonus.textContent="+"+cashBonus()+"%";
+    updateUpgradePreview();
+  };
 }
+
+function updateUpgradePreview(){
+  const items=selectedItems();
+  const ch=totalChance();
+  if(!items.length){
+    upgradeChance.textContent="—";
+    if(upChanceHint) upChanceHint.textContent="шанс";
+    upgradeTarget.textContent="—";
+    btnUpgrade.disabled=true;
+    if(upTargetBox) upTargetBox.innerHTML='<div class="upTargetEmpty">Выбери предметы слева</div>';
+    if(upRingBg) upRingBg.setAttribute("stroke-dasharray","0 327");
+    return;
+  }
+  const sum=selectedSum();
+  const targetPrice=Math.round(sum*upgradeMult);
+  upgradeChance.textContent=ch.toFixed(1)+"%";
+  if(upChanceHint){
+    upChanceHint.textContent=ch>=60?"очень высокий шанс":ch>=35?"средний шанс":"низкий шанс";
+  }
+  upgradeTarget.textContent=fmt(targetPrice)+" DM";
+  btnUpgrade.disabled=cashCost()>balance;
+  // ring arc ~ circumference 2*pi*52 ≈ 327
+  const arc=327*(ch/100);
+  if(upRingBg) upRingBg.setAttribute("stroke-dasharray", arc+" 327");
+  // preview target skin near price
+  const candidates=allSkins.filter(s=>s.max>=targetPrice*0.4 && s.min<=targetPrice*1.6);
+  const preview=candidates.length?candidates[Math.floor(candidates.length/2)]:allSkins[0];
+  if(upTargetBox){
+    upTargetBox.innerHTML=`${imgTag(preview.name)}<div style="margin-top:6px;font-weight:700">${shortName(preview.name)}</div><small style="color:var(--gold)">${fmt(targetPrice)} DM</small>`;
+    upTargetBox.dataset.preview=preview.name;
+  }
+}
+
 btnUpgrade.onclick=()=>{
-  const it=inventory.find(x=>x.id===upgradePickId);
-  if(!it)return;
+  const items=selectedItems();
+  if(!items.length)return;
+  const cash=cashCost();
+  if(cash>balance){alert("Недостаточно DM");return}
+  const ch=totalChance();
+  const sum=selectedSum();
+  const targetPrice=Math.round(sum*upgradeMult);
   btnUpgrade.disabled=true;
-  upgradeResult.textContent="Апгрейд запущен…";
-  const fx=document.getElementById("upgradeFx");
-  const fxItem=document.getElementById("upgradeFxItem");
-  fxItem.innerHTML=`${imgTag(it.name)}<span>${shortName(it.name)}</span>`;
-  fx.classList.remove("on"); void fx.offsetWidth; fx.classList.add("on");
-  const chance=chanceFor(upgradeMult);
+  balance-=cash; updateBalance();
+  upgradeResult.textContent="Модернизация…";
+  ensureAudio();
+
+  // spin arrow: full rotations + land angle
+  // success zone is top portion matching chance% of circle starting from top going clockwise... 
+  // Simpler: random land 0-100, win if land < ch; arrow rotates 360*4 + land*3.6 deg
+  const land=Math.random()*100;
+  const win=land<ch;
+  const deg=360*5 + land*3.6;
+  if(upArrow){
+    upArrow.style.transition="none";
+    upArrow.style.transform="translateX(-50%) rotate(0deg)";
+    void upArrow.offsetWidth;
+    upArrow.classList.add("spinning");
+    upArrow.style.transition="transform 2.6s cubic-bezier(.08,.75,.1,1)";
+    upArrow.style.transform=`translateX(-50%) rotate(${deg}deg)`;
+  }
+  let tn=0;
+  const tiv=setInterval(()=>{ playTick(Math.min(1, tn/45)); tn++; if(tn>45) clearInterval(tiv); },48);
+
   setTimeout(()=>{
-    const idx=inventory.findIndex(x=>x.id===it.id);
-    if(idx<0)return;
-    const win=Math.random()*100<chance;
+    const removeIds=new Set(items.map(x=>x.id));
+    inventory=inventory.filter(x=>!removeIds.has(x.id));
     if(win){
-      const pool=[...regularDrops,...specialDrops];
-      const target=pool[Math.floor(Math.random()*pool.length)];
-      const newPrice=Math.round(it.price*upgradeMult);
-      inventory[idx]={id:invId++,name:target.name,price:newPrice,rarity:target.rarity};
-      fxItem.innerHTML=`${imgTag(target.name)}<span>${shortName(target.name)}</span>`;
-      upgradeResult.innerHTML=`Успех! Получен <b>${shortName(target.name)}</b> · ${fmt(newPrice)} DM`;
+      playWin();
+      const candidates=allSkins.filter(s=>s.max>=targetPrice*0.4 && s.min<=targetPrice*1.6);
+      const target=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:allSkins[Math.floor(Math.random()*allSkins.length)];
+      inventory.push({id:invId++,name:target.name,price:targetPrice,rarity:target.rarity});
+      upgradeChance.textContent="УСПЕХ";
+      if(upChanceHint) upChanceHint.textContent="";
+      if(upTargetBox) upTargetBox.innerHTML=`${imgTag(target.name)}<div style="margin-top:6px;font-weight:700;color:var(--green)">${shortName(target.name)}</div><small style="color:var(--gold)">${fmt(targetPrice)} DM</small>`;
+      upgradeResult.innerHTML=`Успех! Получен <b>${shortName(target.name)}</b> · ${fmt(targetPrice)} DM`;
     }else{
-      inventory.splice(idx,1);
-      fxItem.innerHTML=`<span style="font-size:38px">✕</span><span>Неудача</span>`;
-      upgradeResult.textContent="Неудача — предмет потерян.";
+      playLose();
+      upgradeChance.textContent="НЕУДАЧА";
+      if(upChanceHint) upChanceHint.textContent="";
+      upgradeResult.textContent="Неудача — выбранные предметы и ставка DM сгорели.";
     }
-    setTimeout(()=>fx.classList.remove("on"),900);
-    upgradePickId=null;
+    upgradeSel.clear();
+    if(upgradeCashRange){ upgradeCashRange.value=0; upgradeCashLabel.textContent="0 DM"; upgradeCashBonus.textContent="+0%"; }
     renderInventory();
-  },1400);
+    setTimeout(()=>{ btnUpgrade.disabled=false; },500);
+  },2700);
 };
 
 /* ---------- contracts ---------- */
@@ -642,6 +1579,7 @@ const contractCount=document.getElementById("contractCount");
 const btnContract=document.getElementById("btnContract");
 const contractResult=document.getElementById("contractResult");
 let contractSel=new Set();
+const CONTRACT_MIN=5, CONTRACT_MAX=10;
 
 function renderContractPicker(){
   contractGrid.innerHTML="";
@@ -653,7 +1591,7 @@ function renderContractPicker(){
     d.innerHTML=`<input type="checkbox" ${picked?"checked":""}>${imgTag(it.name)}<span>${shortName(it.name)}</span><small>${fmt(it.price)} DM</small>`;
     d.querySelector("input").onchange=(e)=>{
       if(e.target.checked){
-        if(contractSel.size>=5){e.target.checked=false;return}
+        if(contractSel.size>=CONTRACT_MAX){e.target.checked=false;return}
         contractSel.add(it.id);
       }else{
         contractSel.delete(it.id);
@@ -663,31 +1601,55 @@ function renderContractPicker(){
     contractGrid.appendChild(d);
   });
   contractCount.textContent=contractSel.size;
-  btnContract.disabled=contractSel.size!==5;
+  btnContract.disabled=contractSel.size<CONTRACT_MIN || contractSel.size>CONTRACT_MAX;
 }
+
 btnContract.onclick=()=>{
   const chosen=inventory.filter(x=>contractSel.has(x.id));
-  if(chosen.length!==5)return;
+  if(chosen.length<CONTRACT_MIN || chosen.length>CONTRACT_MAX)return;
   btnContract.disabled=true;
-  contractResult.textContent="Предметы объединяются…";
+  contractResult.textContent="Слияние предметов…";
   const fx=document.getElementById("contractFx");
   const fxItem=document.getElementById("contractFxItem");
-  fxItem.innerHTML=chosen.map(x=>`<img src="${itemImg(x.name)}" alt="${shortName(x.name)}" style="width:38px;height:28px">`).join("");
+  const orbit=document.getElementById("contractOrbit");
+  // chips orbit into center
+  orbit.innerHTML=chosen.map((x,i)=>{
+    const rot=(360/chosen.length)*i;
+    return `<div class="fxChip" style="--rot:${rot}deg"><img src="${itemImg(x.name)}" alt=""></div>`;
+  }).join("");
+  fxItem.innerHTML="";
   fx.classList.remove("on"); void fx.offsetWidth; fx.classList.add("on");
+
   setTimeout(()=>{
-    const avg=chosen.reduce((s,x)=>s+x.price,0)/chosen.length;
-    const newPrice=Math.round(avg*1.5/5)*5;
-    const pool=[...regularDrops,...specialDrops];
-    const target=pool[Math.floor(Math.random()*pool.length)];
+    const sum=chosen.reduce((s,x)=>s+x.price,0);
+    // price in [sum-100, sum+500]
+    const lo=Math.max(5, sum-100);
+    const hi=sum+500;
+    let newPrice=Math.round((lo+Math.random()*(hi-lo))/5)*5;
+    newPrice=Math.max(5, newPrice);
+
+    // pick skin whose market range is closest to newPrice
+    let best=allSkins[0], bestDiff=Infinity;
+    for(const s of allSkins){
+      const mid=(s.min+s.max)/2;
+      const d=Math.abs(mid-newPrice);
+      if(d<bestDiff){bestDiff=d;best=s}
+    }
+    // prefer same ballpark: among skins where min<=newPrice*1.4 and max>=newPrice*0.6
+    const candidates=allSkins.filter(s=>s.max>=newPrice*0.5 && s.min<=newPrice*1.5);
+    const target=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:best;
+
     inventory=inventory.filter(x=>!contractSel.has(x.id));
     const newItem={id:invId++,name:target.name,price:newPrice,rarity:target.rarity};
     inventory.push(newItem);
     contractSel.clear();
     fxItem.innerHTML=`${imgTag(target.name)}<span>${shortName(target.name)}</span>`;
-    contractResult.innerHTML=`Контракт выполнен! Получен <b>${shortName(target.name)}</b> · ${fmt(newPrice)} DM`;
-    setTimeout(()=>fx.classList.remove("on"),1000);
+    const delta=newPrice-sum;
+    const deltaStr=delta>=0?`+${fmt(delta)}`:`${fmt(delta)}`;
+    contractResult.innerHTML=`Контракт выполнен! <b>${shortName(target.name)}</b> · ${fmt(newPrice)} DM <span style="color:${delta>=0?'var(--green)':'var(--red)'}">(${deltaStr} от суммы)</span>`;
+    setTimeout(()=>fx.classList.remove("on"),1200);
     renderInventory();
-  },1600);
+  },1850);
 };
 
 /* ---------- bottom nav active state ---------- */
@@ -714,7 +1676,7 @@ document.querySelectorAll(".bottomNav a").forEach(a=>{
 modal.addEventListener("click",e=>{ if(e.target===modal) closeModal(); });
 
 render();
-renderDropList();
+renderDropList(casePools.kilowatt);
 renderInventory();
 updateBottomNav();
 </script>
