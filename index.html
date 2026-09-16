@@ -170,6 +170,20 @@ select{background:#171d27;border:1px solid var(--line);color:#fff;border-radius:
 .actions button{flex:1;padding:14px;border-radius:10px;border:1px solid var(--line);background:#1a212c;color:#fff;font-weight:700;min-height:48px;font-size:14px}
 .actions .primary{background:var(--accent);border-color:var(--accent)}
 
+/* multi-open */
+.multiRow{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.multiBtn{flex:1;min-width:64px;padding:10px 8px;border-radius:9px;border:1px solid var(--line);background:#171d27;color:#d9e0ea;font-weight:800;min-height:44px;font-size:13px}
+.multiBtn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.multiBtn:disabled{opacity:.4;cursor:not-allowed}
+.multiInfo{font-size:12px;color:var(--muted);margin:-4px 0 10px;min-height:16px}
+.multiResults{display:none;grid-template-columns:repeat(4,1fr);gap:8px;max-height:240px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin:10px 0}
+.multiResults.on{display:grid}
+.multiResults .resItem{background:#171d27;border:1px solid var(--line);border-left:3px solid var(--line);border-radius:9px;padding:8px;text-align:center;font-size:10px}
+.multiResults .resItem img{width:100%;height:40px;object-fit:contain;margin-bottom:4px}
+.multiResults .resItem b{display:block;font-size:11px;line-height:1.2;margin-bottom:2px}
+.multiResults .resItem small{color:var(--gold);font-weight:800}
+@media(max-width:600px){.multiResults{grid-template-columns:repeat(3,1fr)}}
+
 footer{max-width:1240px;margin:auto;padding:0 14px 16px;color:#687487;border-top:1px solid var(--line);padding-top:16px;font-size:12px;text-align:center}
 
 /* bottom nav — mobile */
@@ -282,7 +296,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 
 <section id="cases" class="section">
   <h2>Популярные кейсы</h2>
-  <p class="sectionHint">Кейсы с пулами как в CS2 (шансы официальные). Цены предметов — ориентир по Steam Market (демо, не live). ★ Ножевой кейс за 10 000 — ножи, перчатки и Dragon Lore.</p>
+  <p class="sectionHint">Кейсы с пулами как в CS2 (шансы официальные). Цены предметов — ориентир по Steam Market (демо, не live). ★ Ножевой кейс за 10 000 — ножи, перчатки и Dragon Lore.</p>
   <div id="grid" class="grid"></div>
   <div id="empty" class="empty">Ничего не найдено</div>
 </section>
@@ -349,7 +363,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
           <div class="upTargetEmpty">Выбери предметы слева</div>
         </div>
         <div class="stat" style="margin-top:10px;width:100%"><span>Цель при успехе</span><b id="upgradeTarget">—</b></div>
-        <div class="stat" style="margin-top:8px;width:100%"><span>При неудаче</span><b style="color:var(--red)">предметы сгорают</b></div>
+        <div class="stat" style="margin-top:8px;width:100%"><span>При неудаче</span><b style="color:var(--gold)">скины остаются</b></div>
       </div>
     </div>
     <div class="upgradeResult" id="upgradeResult"></div>
@@ -386,10 +400,24 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <div class="modal" id="modal">
   <div class="dialog">
     <h2 id="modalTitle">Открытие кейса</h2>
+
+    <div class="multiRow" id="multiRow">
+      <button type="button" class="multiBtn active" data-count="1">×1</button>
+      <button type="button" class="multiBtn" data-count="2">×2</button>
+      <button type="button" class="multiBtn" data-count="3">×3</button>
+      <button type="button" class="multiBtn" data-count="5">×5</button>
+      <button type="button" class="multiBtn" data-count="10">×10</button>
+    </div>
+    <div class="multiInfo" id="multiInfo"></div>
+
     <div class="roulette"><div class="marker"></div><div class="track" id="track"></div></div>
+
     <div class="dropToggle"><button type="button" id="dropToggleBtn">Показать возможные предметы</button></div>
     <div class="dropList" id="dropList"></div>
+
     <div class="result" id="result">Нажми «Открыть», чтобы запустить рулетку</div>
+    <div class="multiResults" id="multiResults"></div>
+
     <div class="actions">
       <button type="button" onclick="closeModal()">Закрыть</button>
       <button type="button" class="primary" id="spin">Открыть за 0 DM</button>
@@ -1216,6 +1244,10 @@ const modalTitle=document.getElementById("modalTitle");
 const spin=document.getElementById("spin");
 const result=document.getElementById("result");
 const track=document.getElementById("track");
+const multiRow=document.getElementById("multiRow");
+const multiInfo=document.getElementById("multiInfo");
+const multiResults=document.getElementById("multiResults");
+let openCount=1; // сколько кейсов открываем за раз
 
 function render(list=cases){
   grid.innerHTML="";
@@ -1270,32 +1302,97 @@ function openCase(c){
   current=c;
   currentPool=getPool(c);
   modalTitle.textContent=`${c[0]} — открытие`;
-  spin.textContent=`Открыть за ${fmt(c[2])} DM`;
-  spin.disabled=false;
+
+  // максимум, сколько можем открыть с текущим балансом (но не больше 10)
+  const maxAffordable=Math.min(10, Math.floor(balance/c[2]));
+  // сбрасываем счётчик на 1, если выбранный больше доступного
+  if(openCount>maxAffordable) openCount=Math.max(1,maxAffordable);
+  syncMultiButtons(maxAffordable);
+
   result.textContent="Нажми «Открыть», чтобы запустить рулетку";
+  multiResults.classList.remove("on");
+  multiResults.innerHTML="";
   dropList.classList.remove("on");
   dropToggleBtn.textContent="Показать возможные предметы";
   renderDropList(currentPool);
   buildReel(null);
+  updateSpinButton();
   modal.classList.add("on");
   document.body.style.overflow="hidden";
 }
+
+/* Синхронизация кнопок ×N с балансом */
+function syncMultiButtons(maxAffordable){
+  if(!multiRow) return;
+  multiRow.querySelectorAll(".multiBtn").forEach(b=>{
+    const n=Number(b.dataset.count);
+    const dis = n>maxAffordable;
+    b.disabled = dis;
+    b.classList.toggle("active", !dis && n===openCount);
+  });
+  updateMultiInfo(maxAffordable);
+}
+
+function updateMultiInfo(maxAffordable){
+  if(!multiInfo || !current) return;
+  if(maxAffordable<=0){
+    multiInfo.textContent="Недостаточно средств даже на 1 кейс.";
+    return;
+  }
+  const totalCost=current[2]*openCount;
+  multiInfo.textContent=`Открытий: ${openCount} · Стоимость: ${fmt(totalCost)} DM · Хватит ещё на ${maxAffordable} кейс(ов)`;
+}
+
+/* Пересчёт состояния кнопки "Открыть" */
+function updateSpinButton(){
+  if(!current){spin.disabled=true;return}
+  const cost=current[2]*openCount;
+  spin.textContent=`Открыть ×${openCount} за ${fmt(cost)} DM`;
+  const enough = balance >= cost && openCount>=1;
+  spin.disabled = !enough;
+  if(!enough){
+    result.textContent="Недостаточно демо-монет для выбранного количества. Уменьши ×N или пополни баланс.";
+  }
+}
+
+/* Клики по кнопкам ×N */
+if(multiRow){
+  multiRow.querySelectorAll(".multiBtn").forEach(b=>{
+    b.onclick=()=>{
+      const n=Number(b.dataset.count);
+      const maxAffordable=Math.min(10, Math.floor(balance/current[2]));
+      if(n>maxAffordable){return}
+      openCount=n;
+      syncMultiButtons(maxAffordable);
+      updateSpinButton();
+    };
+  });
+}
+
 function closeModal(){
   modal.classList.remove("on");
   document.body.style.overflow="";
+  if(multiResults){multiResults.classList.remove("on");multiResults.innerHTML="";}
 }
 spin.onclick=()=>{
   if(!current)return;
-  balance-=current[2];updateBalance();
+  const unitCost=current[2];
+  const totalCost=unitCost*openCount;
+  if(balance<totalCost) { updateSpinButton(); return; }
+
+  balance-=totalCost;updateBalance();
   spin.disabled=true;
-  result.textContent="Крутим…";
+  result.textContent=`Крутим ×${openCount}…`;
+  multiResults.classList.remove("on");
+  multiResults.innerHTML="";
 
-  // 1) decide the real winner first
-  const winEntry=weightedPickFrom(currentPool);
-  // 2) put that winner exactly under the marker stop position
-  buildReel(winEntry);
+  // Заранее определяем всех победителей
+  const winners=[];
+  for(let i=0;i<openCount;i++) winners.push(weightedPickFrom(currentPool));
 
-  // 3) measure where the winning item's center should land
+  // На рулетке показываем первого победителя (для визуала)
+  buildReel(winners[0]);
+
   ensureAudio();
   let tickN=0;
   const tickIv=setInterval(()=>{
@@ -1313,14 +1410,37 @@ spin.onclick=()=>{
   })});
 
   setTimeout(()=>{
-    const price=priceFor(winEntry);
-    const item={id:invId++,name:winEntry.name,price,rarity:winEntry.rarity};
-    inventory.push(item);
+    // Зачисляем все предметы
+    const gained=[];
+    let totalGain=0;
+    winners.forEach(w=>{
+      const price=priceFor(w);
+      totalGain+=price;
+      const item={id:invId++,name:w.name,price,rarity:w.rarity};
+      inventory.push(item);
+      gained.push({entry:w,price});
+    });
     renderInventory();
-    const star=winEntry.rarity==="special"?" ★":"";
-    playWin(); result.innerHTML=`Ты получил <b>${shortName(winEntry.name)}</b>${star} · ${fmt(price)} DM — предмет добавлен в инвентарь 🎉`;
-    spin.disabled=false;
-    spin.textContent=`Открыть ещё за ${fmt(current[2])} DM`;
+    playWin();
+
+    if(openCount===1){
+      const g=gained[0];
+      const star=g.entry.rarity==="special"?" ★":"";
+      result.innerHTML=`Ты получил <b>${shortName(g.entry.name)}</b>${star} · ${fmt(g.price)} DM — предмет добавлен в инвентарь 🎉`;
+    }else{
+      result.innerHTML=`Открыто <b>${openCount}</b> кейсов · Получено на <b>${fmt(totalGain)} DM</b>`;
+      multiResults.innerHTML=gained.map(g=>{
+        const col=rarityColor[g.entry.rarity]||"#b0c3d9";
+        return `<div class="resItem" style="border-left-color:${col}">${imgTag(g.entry.name)}<b>${shortName(g.entry.name)}</b><small>${fmt(g.price)} DM</small></div>`;
+      }).join("");
+      multiResults.classList.add("on");
+    }
+
+    // Пересчитываем доступное количество и состояние кнопки
+    const maxAffordable=Math.min(10, Math.floor(balance/unitCost));
+    if(openCount>maxAffordable) openCount=Math.max(1,maxAffordable);
+    syncMultiButtons(maxAffordable);
+    updateSpinButton();
   },2500);
 };
 
@@ -1548,10 +1668,11 @@ btnUpgrade.onclick=()=>{
   const tiv=setInterval(()=>{ playTick(Math.min(1, tn/45)); tn++; if(tn>45) clearInterval(tiv); },48);
 
   setTimeout(()=>{
-    const removeIds=new Set(items.map(x=>x.id));
-    inventory=inventory.filter(x=>!removeIds.has(x.id));
     if(win){
       playWin();
+      // success: remove input skins, add upgraded one
+      const removeIds=new Set(items.map(x=>x.id));
+      inventory=inventory.filter(x=>!removeIds.has(x.id));
       const candidates=allSkins.filter(s=>s.max>=targetPrice*0.4 && s.min<=targetPrice*1.6);
       const target=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:allSkins[Math.floor(Math.random()*allSkins.length)];
       inventory.push({id:invId++,name:target.name,price:targetPrice,rarity:target.rarity});
@@ -1559,13 +1680,16 @@ btnUpgrade.onclick=()=>{
       if(upChanceHint) upChanceHint.textContent="";
       if(upTargetBox) upTargetBox.innerHTML=`${imgTag(target.name)}<div style="margin-top:6px;font-weight:700;color:var(--green)">${shortName(target.name)}</div><small style="color:var(--gold)">${fmt(targetPrice)} DM</small>`;
       upgradeResult.innerHTML=`Успех! Получен <b>${shortName(target.name)}</b> · ${fmt(targetPrice)} DM`;
+      upgradeSel.clear();
     }else{
       playLose();
+      // fail: skins stay in inventory, only spent DM is lost
       upgradeChance.textContent="НЕУДАЧА";
       if(upChanceHint) upChanceHint.textContent="";
-      upgradeResult.textContent="Неудача — выбранные предметы и ставка DM сгорели.";
+      upgradeResult.textContent=cash>0
+        ? "Неудача — скины остались, списана только ставка DM."
+        : "Неудача — скины остались на месте.";
     }
-    upgradeSel.clear();
     if(upgradeCashRange){ upgradeCashRange.value=0; upgradeCashLabel.textContent="0 DM"; upgradeCashBonus.textContent="+0%"; }
     renderInventory();
     setTimeout(()=>{ btnUpgrade.disabled=false; },500);
